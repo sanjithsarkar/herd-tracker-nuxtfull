@@ -9,15 +9,15 @@
         <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
           <div class="form-group" style="min-width: 140px; margin-bottom: 0;">
             <label>Device Type</label>
-            <select v-model="newDeviceType" class="input">
+            <select v-model="ui.newDeviceType" class="input">
               <option value="mobile">Mobile</option>
               <option value="laptop">Laptop</option>
             </select>
           </div>
-          <div v-if="newDeviceType === 'mobile'" class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+          <div v-if="ui.newDeviceType === 'mobile'" class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
             <label>IMEI Number (15 digits)</label>
             <input
-              v-model="newImei"
+              v-model="ui.newImei"
               type="text"
               class="input"
               placeholder="123456789012345"
@@ -29,7 +29,7 @@
           <div v-else class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
             <label>Serial Number / Identifier</label>
             <input
-              v-model="newIdentifier"
+              v-model="ui.newIdentifier"
               type="text"
               class="input"
               placeholder="e.g. SN-ABC123, hostname"
@@ -41,21 +41,21 @@
           <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
             <label>Device Name</label>
             <input
-              v-model="newName"
+              v-model="ui.newName"
               type="text"
               class="input"
-              :placeholder="newDeviceType === 'mobile' ? 'e.g. iPhone, Samsung' : 'e.g. MacBook Pro, ThinkPad'"
+              :placeholder="ui.newDeviceType === 'mobile' ? 'e.g. iPhone, Samsung' : 'e.g. MacBook Pro, ThinkPad'"
             />
           </div>
-          <button type="submit" class="btn btn-primary" style="align-self: flex-end;" :disabled="adding">
-            {{ adding ? 'Adding...' : 'Add Device' }}
+          <button type="submit" class="btn btn-primary" style="align-self: flex-end;" :disabled="ui.adding">
+            {{ ui.adding ? 'Adding...' : 'Add Device' }}
           </button>
         </div>
-        <p v-if="addError" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem;">
-          {{ addError }}
+        <p v-if="ui.addError" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem;">
+          {{ ui.addError }}
         </p>
         <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.75rem;">
-          <template v-if="newDeviceType === 'mobile'">
+          <template v-if="ui.newDeviceType === 'mobile'">
             IMEI check: Phone dial *#06# to see your IMEI number.
           </template>
           <template v-else>
@@ -74,7 +74,7 @@
         </span>
       </h3>
 
-      <div v-if="loading" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+      <div v-if="ui.devicesLoading" style="text-align: center; padding: 2rem; color: var(--text-muted);">
         Loading devices...
       </div>
 
@@ -86,10 +86,10 @@
         <div v-for="device in auth.devices" :key="device.id" class="device-item">
           <div class="device-info">
             <div class="device-header">
-              <span v-if="editingId !== device.id" class="device-name">{{ device.name }}</span>
+              <span v-if="ui.editingId !== device.id" class="device-name">{{ device.name }}</span>
               <input
                 v-else
-                v-model="editName"
+                v-model="ui.editName"
                 class="input"
                 style="max-width: 200px; padding: 0.4rem 0.6rem; font-size: 0.9rem;"
                 @keyup.enter="saveEdit(device.id)"
@@ -111,8 +111,8 @@
           </div>
 
           <div class="device-actions">
-            <template v-if="editingId !== device.id">
-              <button class="btn-icon" title="Edit" @click="startEdit(device)">
+            <template v-if="ui.editingId !== device.id">
+              <button class="btn-icon" title="Edit" @click="ui.startEdit(device.id, device.name)">
                 Edit
               </button>
               <button
@@ -128,7 +128,7 @@
             </template>
             <template v-else>
               <button class="btn-icon" @click="saveEdit(device.id)">Save</button>
-              <button class="btn-icon" @click="editingId = null">Cancel</button>
+              <button class="btn-icon" @click="ui.cancelEdit()">Cancel</button>
             </template>
           </div>
         </div>
@@ -143,65 +143,49 @@ definePageMeta({
 })
 
 const auth = useAuthStore()
-
-const newDeviceType = ref<'mobile' | 'laptop'>('mobile')
-const newImei = ref('')
-const newIdentifier = ref('')
-const newName = ref('')
-const adding = ref(false)
-const addError = ref('')
-const loading = ref(false)
-const editingId = ref<string | null>(null)
-const editName = ref('')
+const ui = useDevicesUiStore()
 
 const formatTime = (ts: string) => new Date(ts).toLocaleString()
 
 onMounted(async () => {
-  loading.value = true
+  ui.setDevicesLoading(true)
   try {
     await auth.fetchDevices()
   } catch {
     // ignore
   } finally {
-    loading.value = false
+    ui.setDevicesLoading(false)
   }
 })
 
 const addDevice = async () => {
-  adding.value = true
-  addError.value = ''
+  ui.setAdding(true)
+  ui.setAddError('')
 
   try {
     const data: any = {
-      deviceType: newDeviceType.value,
-      name: newName.value || (newDeviceType.value === 'mobile' ? 'My Phone' : 'My Laptop'),
+      deviceType: ui.newDeviceType,
+      name: ui.newName || (ui.newDeviceType === 'mobile' ? 'My Phone' : 'My Laptop'),
     }
-    if (newDeviceType.value === 'mobile') {
-      data.imei = newImei.value
+    if (ui.newDeviceType === 'mobile') {
+      data.imei = ui.newImei
     } else {
-      data.identifier = newIdentifier.value
+      data.identifier = ui.newIdentifier
     }
 
     await auth.registerDevice(data)
-    newImei.value = ''
-    newIdentifier.value = ''
-    newName.value = ''
+    ui.resetAddForm()
   } catch (err: any) {
-    addError.value = err?.data?.message || err?.message || 'Failed to add device'
+    ui.setAddError(err?.data?.message || err?.message || 'Failed to add device')
   } finally {
-    adding.value = false
+    ui.setAdding(false)
   }
-}
-
-const startEdit = (device: any) => {
-  editingId.value = device.id
-  editName.value = device.name
 }
 
 const saveEdit = async (deviceId: string) => {
   try {
-    await auth.updateDevice(deviceId, { name: editName.value })
-    editingId.value = null
+    await auth.updateDevice(deviceId, { name: ui.editName })
+    ui.saveEditDone()
   } catch {
     // ignore
   }

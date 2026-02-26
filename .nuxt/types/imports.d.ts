@@ -105,11 +105,14 @@ declare global {
   const useCookie: typeof import('../../node_modules/nuxt/dist/app/composables/cookie').useCookie
   const useCssModule: typeof import('../../node_modules/vue').useCssModule
   const useCssVars: typeof import('../../node_modules/vue').useCssVars
+  const useDashboardStore: typeof import('../../stores/dashboard').useDashboardStore
+  const useDevicesUiStore: typeof import('../../stores/devices-ui').useDevicesUiStore
   const useError: typeof import('../../node_modules/nuxt/dist/app/composables/error').useError
   const useFetch: typeof import('../../node_modules/nuxt/dist/app/composables/fetch').useFetch
   const useGeolocation: typeof import('../../composables/useGeolocation').useGeolocation
   const useHead: typeof import('../../node_modules/nuxt/dist/app/composables/head').useHead
   const useHeadSafe: typeof import('../../node_modules/nuxt/dist/app/composables/head').useHeadSafe
+  const useHistoryStore: typeof import('../../stores/history').useHistoryStore
   const useHydration: typeof import('../../node_modules/nuxt/dist/app/composables/hydrate').useHydration
   const useId: typeof import('../../node_modules/vue').useId
   const useLazyAsyncData: typeof import('../../node_modules/nuxt/dist/app/composables/asyncData').useLazyAsyncData
@@ -169,6 +172,7 @@ declare global {
   const useShadowRoot: typeof import('../../node_modules/vue').useShadowRoot
   const useSlots: typeof import('../../node_modules/vue').useSlots
   const useSocket: typeof import('../../composables/useSocket').useSocket
+  const useSocketStore: typeof import('../../stores/socket').useSocketStore
   const useState: typeof import('../../node_modules/nuxt/dist/app/composables/state').useState
   const useTemplateRef: typeof import('../../node_modules/vue').useTemplateRef
   const useTrackingStore: typeof import('../../stores/tracking').useTrackingStore
@@ -189,6 +193,12 @@ declare global {
   // @ts-ignore
   export type { Component, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from '../../node_modules/vue'
   import('../../node_modules/vue')
+  // @ts-ignore
+  export type { LocationPoint } from '../../stores/dashboard'
+  import('../../stores/dashboard')
+  // @ts-ignore
+  export type { HistoryLocation, HistorySession } from '../../stores/history'
+  import('../../stores/history')
 }
 // for vue template auto import
 import { UnwrapRef } from 'vue'
@@ -298,11 +308,14 @@ declare module 'vue' {
     readonly useCookie: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/cookie')['useCookie']>
     readonly useCssModule: UnwrapRef<typeof import('../../node_modules/vue')['useCssModule']>
     readonly useCssVars: UnwrapRef<typeof import('../../node_modules/vue')['useCssVars']>
+    readonly useDashboardStore: UnwrapRef<typeof import('../../stores/dashboard')['useDashboardStore']>
+    readonly useDevicesUiStore: UnwrapRef<typeof import('../../stores/devices-ui')['useDevicesUiStore']>
     readonly useError: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/error')['useError']>
     readonly useFetch: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/fetch')['useFetch']>
     readonly useGeolocation: UnwrapRef<typeof import('../../composables/useGeolocation')['useGeolocation']>
     readonly useHead: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/head')['useHead']>
     readonly useHeadSafe: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/head')['useHeadSafe']>
+    readonly useHistoryStore: UnwrapRef<typeof import('../../stores/history')['useHistoryStore']>
     readonly useHydration: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/hydrate')['useHydration']>
     readonly useId: UnwrapRef<typeof import('../../node_modules/vue')['useId']>
     readonly useLazyAsyncData: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/asyncData')['useLazyAsyncData']>
@@ -362,6 +375,7 @@ declare module 'vue' {
     readonly useShadowRoot: UnwrapRef<typeof import('../../node_modules/vue')['useShadowRoot']>
     readonly useSlots: UnwrapRef<typeof import('../../node_modules/vue')['useSlots']>
     readonly useSocket: UnwrapRef<typeof import('../../composables/useSocket')['useSocket']>
+    readonly useSocketStore: UnwrapRef<typeof import('../../stores/socket')['useSocketStore']>
     readonly useState: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/state')['useState']>
     readonly useTemplateRef: UnwrapRef<typeof import('../../node_modules/vue')['useTemplateRef']>
     readonly useTrackingStore: UnwrapRef<typeof import('../../stores/tracking')['useTrackingStore']>

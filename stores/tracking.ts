@@ -1,5 +1,3 @@
-import { defineStore } from 'pinia'
-
 interface LocationData {
   latitude: number
   longitude: number

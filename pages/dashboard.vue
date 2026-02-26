@@ -3,15 +3,15 @@
     <div class="dashboard-header">
       <h2>Live Dashboard</h2>
       <div style="display: flex; align-items: center; gap: 1rem;">
-        <select v-model="filterDeviceId" class="input" style="width: auto; padding: 0.4rem 0.6rem; font-size: 0.85rem;">
+        <select v-model="dashboard.filterDeviceId" class="input" style="width: auto; padding: 0.4rem 0.6rem; font-size: 0.85rem;">
           <option value="">All Devices</option>
           <option v-for="device in auth.devices" :key="device.id" :value="device.id">
             {{ device.name }} ({{ device.deviceType === 'laptop' ? device.identifier?.slice(-6) : device.imei?.slice(-4) }})
           </option>
         </select>
-        <span :class="['badge', socketConnected ? 'badge-success' : 'badge-danger']">
+        <span :class="['badge', socketStore.isConnected ? 'badge-success' : 'badge-danger']">
           <span class="badge-dot"></span>
-          {{ socketConnected ? 'Connected' : 'Disconnected' }}
+          {{ socketStore.isConnected ? 'Connected' : 'Disconnected' }}
         </span>
       </div>
     </div>
@@ -25,30 +25,30 @@
     <div class="dashboard-grid">
       <div class="card">
         <h3 style="margin-bottom: 1rem;">Latest Location</h3>
-        <div v-if="latestLocation">
-          <div class="info-row" v-if="latestLocation.deviceName">
+        <div v-if="dashboard.latestLocation">
+          <div class="info-row" v-if="dashboard.latestLocation.deviceName">
             <span class="info-label">Device</span>
-            <span>{{ latestLocation.deviceName }}</span>
+            <span>{{ dashboard.latestLocation.deviceName }}</span>
           </div>
-          <div class="info-row" v-if="latestLocation.imei">
+          <div class="info-row" v-if="dashboard.latestLocation.imei">
             <span class="info-label">IMEI</span>
-            <span>{{ latestLocation.imei }}</span>
+            <span>{{ dashboard.latestLocation.imei }}</span>
           </div>
           <div class="info-row">
             <span class="info-label">Latitude</span>
-            <span>{{ latestLocation.latitude.toFixed(6) }}</span>
+            <span>{{ dashboard.latestLocation.latitude.toFixed(6) }}</span>
           </div>
           <div class="info-row">
             <span class="info-label">Longitude</span>
-            <span>{{ latestLocation.longitude.toFixed(6) }}</span>
+            <span>{{ dashboard.latestLocation.longitude.toFixed(6) }}</span>
           </div>
           <div class="info-row">
             <span class="info-label">Accuracy</span>
-            <span>{{ latestLocation.accuracy?.toFixed(1) || 'N/A' }}m</span>
+            <span>{{ dashboard.latestLocation.accuracy?.toFixed(1) || 'N/A' }}m</span>
           </div>
           <div class="info-row">
             <span class="info-label">Time</span>
-            <span>{{ formatTime(latestLocation.timestamp) }}</span>
+            <span>{{ formatTime(dashboard.latestLocation.timestamp) }}</span>
           </div>
         </div>
         <p v-else style="color: var(--text-muted);">
@@ -66,8 +66,8 @@
           <div
             v-for="(device, i) in auth.devices"
             :key="device.id"
-            :class="['device-card', { selected: filterDeviceId === device.id }]"
-            @click="filterDeviceId = filterDeviceId === device.id ? '' : device.id"
+            :class="['device-card', { selected: dashboard.filterDeviceId === device.id }]"
+            @click="dashboard.setFilterDeviceId(dashboard.filterDeviceId === device.id ? '' : device.id)"
           >
             <div style="display: flex; align-items: center; gap: 0.5rem;">
               <span class="color-dot" :style="{ background: markerColors[i % markerColors.length] }"></span>
@@ -88,33 +88,22 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, watch } from 'vue'
 
 definePageMeta({
   middleware: 'auth',
 })
 
-interface LocationPoint {
-  latitude: number
-  longitude: number
-  accuracy?: number
-  timestamp: string | number
-  deviceId?: string
-  imei?: string
-  deviceName?: string
-}
-
 const markerColors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
 
-const { store: auth, authFetch } = useAuth()
-const { on, off, isConnected: socketConnected } = useSocket()
+const auth = useAuthStore()
+const dashboard = useDashboardStore()
+const socketStore = useSocketStore()
+const { on, off } = useSocket()
 
 const mapRef = ref<HTMLElement | null>(null)
-const latestLocation = ref<LocationPoint | null>(null)
-const filterDeviceId = ref('')
-
 let map: any = null
-const deviceMarkers = new Map<string, any>() // deviceId -> marker
+const deviceMarkers = new Map<string, any>()
 let defaultMarker: any = null
 
 const formatTime = (ts: string | number) => {
@@ -140,7 +129,7 @@ const ensureMap = async (lat: number, lng: number) => {
   return L
 }
 
-const updateMarker = async (data: LocationPoint) => {
+const updateMarker = async (data: import('~/stores/dashboard').LocationPoint) => {
   const L = await ensureMap(data.latitude, data.longitude)
   if (!L || !map) return
 
@@ -173,46 +162,24 @@ const updateMarker = async (data: LocationPoint) => {
     }
   }
 
-  // Pan to the updated device if it matches filter or no filter
-  if (!filterDeviceId.value || filterDeviceId.value === data.deviceId) {
+  if (!dashboard.filterDeviceId || dashboard.filterDeviceId === data.deviceId) {
     map.panTo([data.latitude, data.longitude])
   }
 }
 
-const fetchLatest = async () => {
-  try {
-    let url = `/api/location/latest/${auth.user?.id}`
-    if (filterDeviceId.value) url += `?deviceId=${filterDeviceId.value}`
-
-    const data = await authFetch<LocationPoint>(url)
-    if (data) {
-      latestLocation.value = data
-      // Find device name
-      if (data.deviceId) {
-        const dev = auth.devices.find((d) => d.id === (data as any).deviceId)
-        if (dev) data.deviceName = dev.name
-      }
-      updateMarker(data)
-    }
-  } catch {
-    // No location data yet
-  }
-}
-
-const handleLocationUpdate = (data: LocationPoint) => {
-  // Filter by device if active
-  if (filterDeviceId.value && data.deviceId !== filterDeviceId.value) {
-    // Still update marker but don't update the info panel
+const handleLocationUpdate = (data: import('~/stores/dashboard').LocationPoint) => {
+  if (dashboard.filterDeviceId && data.deviceId !== dashboard.filterDeviceId) {
     updateMarker(data)
     return
   }
-  latestLocation.value = data
+  dashboard.setLatestLocation(data)
   updateMarker(data)
 }
 
-// Re-fetch when device filter changes
-watch(filterDeviceId, () => {
-  fetchLatest()
+watch(() => dashboard.filterDeviceId, () => {
+  dashboard.fetchLatest().then((data) => {
+    if (data) updateMarker(data)
+  })
 })
 
 onMounted(async () => {
@@ -226,10 +193,11 @@ onMounted(async () => {
     }
   }
 
-  fetchLatest()
+  const data = await dashboard.fetchLatest()
+  if (data) updateMarker(data)
 
   setTimeout(() => {
-    if (!latestLocation.value && mapRef.value) {
+    if (!dashboard.latestLocation && mapRef.value) {
       ensureMap(23.8103, 90.4125)
     }
   }, 1000)

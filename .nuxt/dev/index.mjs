@@ -1,45 +1,45 @@
 import process from 'node:process';globalThis._importMeta_={url:import.meta.url,env:process.env};import { tmpdir } from 'node:os';
-import { defineEventHandler, handleCacheHeaders, splitCookiesString, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, sendRedirect, proxyRequest, getRequestHeader, setResponseHeaders, setResponseStatus, send, getRequestHeaders, setResponseHeader, appendResponseHeader, getRequestURL, getResponseHeader, removeResponseHeader, createError, getQuery as getQuery$1, readBody, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, getResponseStatus, getRouterParam, getResponseStatusText } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/h3/dist/index.mjs';
+import { defineEventHandler, handleCacheHeaders, splitCookiesString, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, sendRedirect, proxyRequest, getRequestHeader, setResponseHeaders, setResponseStatus, send, getRequestHeaders, setResponseHeader, appendResponseHeader, getRequestURL, getResponseHeader, removeResponseHeader, createError, getQuery as getQuery$1, readBody, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, getResponseStatus, getRouterParam, getResponseStatusText } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/h3/dist/index.mjs';
 import { Server as Server$1 } from 'node:http';
 import { resolve, dirname, join } from 'node:path';
 import nodeCrypto from 'node:crypto';
 import { parentPort, threadId } from 'node:worker_threads';
-import { escapeHtml } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/@vue/shared/dist/shared.cjs.js';
-import bcrypt from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/bcryptjs/index.js';
-import { createRenderer, getRequestDependencies, getPreloadLinks, getPrefetchLinks } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/vue-bundle-renderer/dist/runtime.mjs';
-import { parseURL, withoutBase, joinURL, getQuery, withQuery, withTrailingSlash, decodePath, withLeadingSlash, withoutTrailingSlash, joinRelativeURL } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/ufo/dist/index.mjs';
-import destr, { destr as destr$1 } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/destr/dist/index.mjs';
-import { createHooks } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/hookable/dist/index.mjs';
-import { createFetch, Headers as Headers$1 } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/ofetch/dist/node.mjs';
-import { fetchNodeRequestHandler, callNodeRequestHandler } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/node-mock-http/dist/index.mjs';
-import { createStorage, prefixStorage } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/unstorage/dist/index.mjs';
-import unstorage_47drivers_47fs from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/unstorage/drivers/fs.mjs';
-import { digest } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/ohash/dist/index.mjs';
-import { klona } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/klona/dist/index.mjs';
-import defu, { defuFn } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/defu/dist/defu.mjs';
-import { snakeCase } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/scule/dist/index.mjs';
-import { getContext } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/unctx/dist/index.mjs';
-import { toRouteMatcher, createRouter } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/radix3/dist/index.mjs';
+import { escapeHtml } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/@vue/shared/dist/shared.cjs.js';
+import bcrypt from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/bcryptjs/index.js';
+import { createRenderer, getRequestDependencies, getPreloadLinks, getPrefetchLinks } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/vue-bundle-renderer/dist/runtime.mjs';
+import { parseURL, withoutBase, joinURL, getQuery, withQuery, withTrailingSlash, decodePath, withLeadingSlash, withoutTrailingSlash, joinRelativeURL } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/ufo/dist/index.mjs';
+import destr, { destr as destr$1 } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/destr/dist/index.mjs';
+import { createHooks } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/hookable/dist/index.mjs';
+import { createFetch, Headers as Headers$1 } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/ofetch/dist/node.mjs';
+import { fetchNodeRequestHandler, callNodeRequestHandler } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/node-mock-http/dist/index.mjs';
+import { createStorage, prefixStorage } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/unstorage/dist/index.mjs';
+import unstorage_47drivers_47fs from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/unstorage/drivers/fs.mjs';
+import { digest } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/ohash/dist/index.mjs';
+import { klona } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/klona/dist/index.mjs';
+import defu, { defuFn } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/defu/dist/defu.mjs';
+import { snakeCase } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/scule/dist/index.mjs';
+import { getContext } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/unctx/dist/index.mjs';
+import { toRouteMatcher, createRouter } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/radix3/dist/index.mjs';
 import { readFile } from 'node:fs/promises';
-import consola, { consola as consola$1 } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/consola/dist/index.mjs';
-import { ErrorParser } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/youch-core/build/index.js';
-import { Youch } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/youch/build/index.js';
-import { SourceMapConsumer } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/source-map/source-map.js';
+import consola, { consola as consola$1 } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/consola/dist/index.mjs';
+import { ErrorParser } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/youch-core/build/index.js';
+import { Youch } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/youch/build/index.js';
+import { SourceMapConsumer } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/source-map/source-map.js';
 import { AsyncLocalStorage } from 'node:async_hooks';
-import { stringify, uneval } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/devalue/index.js';
-import { captureRawStackTrace, parseRawStackTrace } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/errx/dist/index.js';
-import { isVNode, isRef, toValue } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/vue/index.mjs';
-import { Server } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/socket.io/wrapper.mjs';
-import { PrismaClient } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/@prisma/client/default.js';
-import jwt from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/jsonwebtoken/index.js';
+import { stringify, uneval } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/devalue/index.js';
+import { captureRawStackTrace, parseRawStackTrace } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/errx/dist/index.js';
+import { isVNode, isRef, toValue } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/vue/index.mjs';
+import { Server } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/socket.io/wrapper.mjs';
+import { PrismaClient } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/@prisma/client/default.js';
+import jwt from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/jsonwebtoken/index.js';
 import { promises } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { dirname as dirname$1, resolve as resolve$1 } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/pathe/dist/index.mjs';
-import { createHead as createHead$1, propsToString, renderSSRHead } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/unhead/dist/server.mjs';
-import { renderToString } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/vue/server-renderer/index.mjs';
-import { walkResolver } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/node_modules/unhead/dist/utils.mjs';
+import { dirname as dirname$1, resolve as resolve$1 } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/pathe/dist/index.mjs';
+import { createHead as createHead$1, propsToString, renderSSRHead } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/unhead/dist/server.mjs';
+import { renderToString } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/vue/server-renderer/index.mjs';
+import { walkResolver } from 'file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/unhead/dist/utils.mjs';
 
-const serverAssets = [{"baseName":"server","dir":"/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/server/assets"}];
+const serverAssets = [{"baseName":"server","dir":"/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/server/assets"}];
 
 const assets$1 = createStorage();
 
@@ -51,11 +51,11 @@ const storage = createStorage({});
 
 storage.mount('/assets', assets$1);
 
-storage.mount('root', unstorage_47drivers_47fs({"driver":"fs","readOnly":true,"base":"/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2","watchOptions":{"ignored":[null]}}));
-storage.mount('src', unstorage_47drivers_47fs({"driver":"fs","readOnly":true,"base":"/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/server","watchOptions":{"ignored":[null]}}));
-storage.mount('build', unstorage_47drivers_47fs({"driver":"fs","readOnly":false,"base":"/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/.nuxt"}));
-storage.mount('cache', unstorage_47drivers_47fs({"driver":"fs","readOnly":false,"base":"/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/.nuxt/cache"}));
-storage.mount('data', unstorage_47drivers_47fs({"driver":"fs","base":"/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/.data/kv"}));
+storage.mount('root', unstorage_47drivers_47fs({"driver":"fs","readOnly":true,"base":"/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull","watchOptions":{"ignored":[null]}}));
+storage.mount('src', unstorage_47drivers_47fs({"driver":"fs","readOnly":true,"base":"/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/server","watchOptions":{"ignored":[null]}}));
+storage.mount('build', unstorage_47drivers_47fs({"driver":"fs","readOnly":false,"base":"/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/.nuxt"}));
+storage.mount('cache', unstorage_47drivers_47fs({"driver":"fs","readOnly":false,"base":"/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/.nuxt/cache"}));
+storage.mount('data', unstorage_47drivers_47fs({"driver":"fs","base":"/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/.data/kv"}));
 
 function useStorage(base = "") {
   return base ? prefixStorage(storage, base) : storage;
@@ -2018,7 +2018,7 @@ async function errorHandler(error, event) {
   // H3 will handle fallback
 }
 
-const rootDir = "/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2";
+const rootDir = "/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull";
 
 const appHead = {"meta":[{"charset":"utf-8"},{"name":"viewport","content":"width=device-width, initial-scale=1"},{"name":"description","content":"Track your own device location in real-time"},{"name":"theme-color","content":"#10b981"}],"link":[{"rel":"stylesheet","href":"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"}],"style":[],"script":[],"noscript":[],"title":"Herd Tracker"};
 
@@ -2047,7 +2047,7 @@ const asyncContext = getContext("nuxt-dev", {
 	asyncContext: true,
 	AsyncLocalStorage
 });
-const _UYHPkxNdnhdMBSro0tnqfUha6y1HT6Ua0BBqEU7TIS4 = (nitroApp) => {
+const _yoXghgFWTCa9FqglR3ReGjiUkaDEdOSoDsn_hCPpyA = (nitroApp) => {
 	const handler = nitroApp.h3App.handler;
 	nitroApp.h3App.handler = (event) => {
 		return asyncContext.callAsync({
@@ -2136,7 +2136,7 @@ const verifyToken = (token) => {
 };
 
 let io;
-const _4BvgHtu7Nn2oQqKiKbRxApH3zesT0uLkAHmNLPRayg = defineNitroPlugin((nitroApp) => {
+const _sKBvAAJXKR8m2OJWympHLqpwkOqXrFrRSq10bpHmvM = defineNitroPlugin((nitroApp) => {
   var _a, _b;
   const server = ((_b = (_a = nitroApp.h3App) == null ? void 0 : _a.websocket) == null ? void 0 : _b.server) || nitroApp.h3App;
   io = new Server(server, {
@@ -2230,26 +2230,11 @@ const _4BvgHtu7Nn2oQqKiKbRxApH3zesT0uLkAHmNLPRayg = defineNitroPlugin((nitroApp)
 });
 
 const plugins = [
-  _UYHPkxNdnhdMBSro0tnqfUha6y1HT6Ua0BBqEU7TIS4,
-_4BvgHtu7Nn2oQqKiKbRxApH3zesT0uLkAHmNLPRayg
+  _yoXghgFWTCa9FqglR3ReGjiUkaDEdOSoDsn_hCPpyA,
+_sKBvAAJXKR8m2OJWympHLqpwkOqXrFrRSq10bpHmvM
 ];
 
-const assets = {
-  "/index.mjs": {
-    "type": "text/javascript; charset=utf-8",
-    "etag": "\"2081e-Prlcw05g22uXYbmJXgaZbjWtlp8\"",
-    "mtime": "2026-02-26T07:39:51.403Z",
-    "size": 133150,
-    "path": "index.mjs"
-  },
-  "/index.mjs.map": {
-    "type": "application/json",
-    "etag": "\"7d972-sMrCoiroMe6Hpk15p1E7ANlljGo\"",
-    "mtime": "2026-02-26T07:39:51.403Z",
-    "size": 514418,
-    "path": "index.mjs.map"
-  }
-};
+const assets = {};
 
 function readAsset (id) {
   const serverDir = dirname$1(fileURLToPath(globalThis._importMeta_.url));
@@ -2274,7 +2259,7 @@ function getAsset (id) {
 
 const METHODS = /* @__PURE__ */ new Set(["HEAD", "GET"]);
 const EncodingMap = { gzip: ".gz", br: ".br" };
-const _CvoAYR = eventHandler((event) => {
+const _Psbl7H = eventHandler((event) => {
   if (event.method && !METHODS.has(event.method)) {
     return;
   }
@@ -2338,7 +2323,7 @@ const _CvoAYR = eventHandler((event) => {
   return readAsset(id);
 });
 
-const _gKb0Bj = defineEventHandler(async (event) => {
+const _gFhG3L = defineEventHandler(async (event) => {
   const url = getRequestURL(event);
   const pathname = url.pathname;
   if (pathname.startsWith("/api/auth") || pathname.startsWith("/api/health")) {
@@ -2462,7 +2447,7 @@ const APP_ROOT_CLOSE_TAG = `</${appRootTag}>`;
 // @ts-expect-error file will be produced after app build
 const getServerEntry = () => Promise.resolve().then(function () { return server$1; }).then((r) => r.default || r);
 // @ts-expect-error file will be produced after app build
-const getClientManifest = () => import('file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-v2/.nuxt//dist/server/client.manifest.mjs').then((r) => r.default || r).then((r) => typeof r === "function" ? r() : r);
+const getClientManifest = () => import('file:///Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/.nuxt//dist/server/client.manifest.mjs').then((r) => r.default || r).then((r) => typeof r === "function" ? r() : r);
 // -- SSR Renderer --
 const getSSRRenderer = lazyCachedFunction(async () => {
 	// Load server bundle
@@ -2743,46 +2728,46 @@ async function getIslandContext(event) {
 	return ctx;
 }
 
-const _lazy_S_bd4G = () => Promise.resolve().then(function () { return login_post$1; });
-const _lazy_qzM7fe = () => Promise.resolve().then(function () { return register_post$1; });
-const _lazy_pAvvSX = () => Promise.resolve().then(function () { return _id__delete$3; });
-const _lazy_Ba0lmS = () => Promise.resolve().then(function () { return _id__put$1; });
-const _lazy_LE0Wo5 = () => Promise.resolve().then(function () { return index_post$3; });
-const _lazy_Qr4ZLW = () => Promise.resolve().then(function () { return devices_get$1; });
-const _lazy_Vrcnzo = () => Promise.resolve().then(function () { return health_get$1; });
-const _lazy_sF2pHs = () => Promise.resolve().then(function () { return _userId__get$3; });
-const _lazy_Zhz3Or = () => Promise.resolve().then(function () { return index_post$1; });
-const _lazy_4Qs42d = () => Promise.resolve().then(function () { return _userId__get$1; });
-const _lazy_kV4Yl5 = () => Promise.resolve().then(function () { return _id__delete$1; });
-const _lazy_hh7UeF = () => Promise.resolve().then(function () { return _id__get$1; });
-const _lazy_fjSyZ9 = () => Promise.resolve().then(function () { return stop_post$1; });
-const _lazy_XzFwPs = () => Promise.resolve().then(function () { return active_get$1; });
-const _lazy_QFaOFy = () => Promise.resolve().then(function () { return start_post$1; });
-const _lazy_so1beX = () => Promise.resolve().then(function () { return sessions_get$1; });
-const _lazy_OES6i7 = () => Promise.resolve().then(function () { return renderer$1; });
+const _lazy_yBTCVr = () => Promise.resolve().then(function () { return login_post$1; });
+const _lazy_BJxtFC = () => Promise.resolve().then(function () { return register_post$1; });
+const _lazy_WtKpFX = () => Promise.resolve().then(function () { return _id__delete$3; });
+const _lazy_smvPN9 = () => Promise.resolve().then(function () { return _id__put$1; });
+const _lazy_hnZLQD = () => Promise.resolve().then(function () { return index_post$3; });
+const _lazy_p7GzJc = () => Promise.resolve().then(function () { return devices_get$1; });
+const _lazy_MOfGS8 = () => Promise.resolve().then(function () { return health_get$1; });
+const _lazy_XdJVmw = () => Promise.resolve().then(function () { return _userId__get$3; });
+const _lazy_EGo8r_ = () => Promise.resolve().then(function () { return index_post$1; });
+const _lazy_te3Ze9 = () => Promise.resolve().then(function () { return _userId__get$1; });
+const _lazy_Cm5_Gl = () => Promise.resolve().then(function () { return _id__delete$1; });
+const _lazy_OP8iK8 = () => Promise.resolve().then(function () { return _id__get$1; });
+const _lazy_3Dn_0V = () => Promise.resolve().then(function () { return stop_post$1; });
+const _lazy_mCrW4X = () => Promise.resolve().then(function () { return active_get$1; });
+const _lazy_M_FO_9 = () => Promise.resolve().then(function () { return start_post$1; });
+const _lazy_FOG7zY = () => Promise.resolve().then(function () { return sessions_get$1; });
+const _lazy_9cOspZ = () => Promise.resolve().then(function () { return renderer$1; });
 
 const handlers = [
-  { route: '', handler: _CvoAYR, lazy: false, middleware: true, method: undefined },
-  { route: '', handler: _gKb0Bj, lazy: false, middleware: true, method: undefined },
-  { route: '/api/auth/login', handler: _lazy_S_bd4G, lazy: true, middleware: false, method: "post" },
-  { route: '/api/auth/register', handler: _lazy_qzM7fe, lazy: true, middleware: false, method: "post" },
-  { route: '/api/device/:id', handler: _lazy_pAvvSX, lazy: true, middleware: false, method: "delete" },
-  { route: '/api/device/:id', handler: _lazy_Ba0lmS, lazy: true, middleware: false, method: "put" },
-  { route: '/api/device', handler: _lazy_LE0Wo5, lazy: true, middleware: false, method: "post" },
-  { route: '/api/devices', handler: _lazy_Qr4ZLW, lazy: true, middleware: false, method: "get" },
-  { route: '/api/health', handler: _lazy_Vrcnzo, lazy: true, middleware: false, method: "get" },
-  { route: '/api/location/history/:userId', handler: _lazy_sF2pHs, lazy: true, middleware: false, method: "get" },
-  { route: '/api/location', handler: _lazy_Zhz3Or, lazy: true, middleware: false, method: "post" },
-  { route: '/api/location/latest/:userId', handler: _lazy_4Qs42d, lazy: true, middleware: false, method: "get" },
-  { route: '/api/session/:id', handler: _lazy_kV4Yl5, lazy: true, middleware: false, method: "delete" },
-  { route: '/api/session/:id', handler: _lazy_hh7UeF, lazy: true, middleware: false, method: "get" },
-  { route: '/api/session/:id/stop', handler: _lazy_fjSyZ9, lazy: true, middleware: false, method: "post" },
-  { route: '/api/session/active', handler: _lazy_XzFwPs, lazy: true, middleware: false, method: "get" },
-  { route: '/api/session/start', handler: _lazy_QFaOFy, lazy: true, middleware: false, method: "post" },
-  { route: '/api/sessions', handler: _lazy_so1beX, lazy: true, middleware: false, method: "get" },
-  { route: '/__nuxt_error', handler: _lazy_OES6i7, lazy: true, middleware: false, method: undefined },
+  { route: '', handler: _Psbl7H, lazy: false, middleware: true, method: undefined },
+  { route: '', handler: _gFhG3L, lazy: false, middleware: true, method: undefined },
+  { route: '/api/auth/login', handler: _lazy_yBTCVr, lazy: true, middleware: false, method: "post" },
+  { route: '/api/auth/register', handler: _lazy_BJxtFC, lazy: true, middleware: false, method: "post" },
+  { route: '/api/device/:id', handler: _lazy_WtKpFX, lazy: true, middleware: false, method: "delete" },
+  { route: '/api/device/:id', handler: _lazy_smvPN9, lazy: true, middleware: false, method: "put" },
+  { route: '/api/device', handler: _lazy_hnZLQD, lazy: true, middleware: false, method: "post" },
+  { route: '/api/devices', handler: _lazy_p7GzJc, lazy: true, middleware: false, method: "get" },
+  { route: '/api/health', handler: _lazy_MOfGS8, lazy: true, middleware: false, method: "get" },
+  { route: '/api/location/history/:userId', handler: _lazy_XdJVmw, lazy: true, middleware: false, method: "get" },
+  { route: '/api/location', handler: _lazy_EGo8r_, lazy: true, middleware: false, method: "post" },
+  { route: '/api/location/latest/:userId', handler: _lazy_te3Ze9, lazy: true, middleware: false, method: "get" },
+  { route: '/api/session/:id', handler: _lazy_Cm5_Gl, lazy: true, middleware: false, method: "delete" },
+  { route: '/api/session/:id', handler: _lazy_OP8iK8, lazy: true, middleware: false, method: "get" },
+  { route: '/api/session/:id/stop', handler: _lazy_3Dn_0V, lazy: true, middleware: false, method: "post" },
+  { route: '/api/session/active', handler: _lazy_mCrW4X, lazy: true, middleware: false, method: "get" },
+  { route: '/api/session/start', handler: _lazy_M_FO_9, lazy: true, middleware: false, method: "post" },
+  { route: '/api/sessions', handler: _lazy_FOG7zY, lazy: true, middleware: false, method: "get" },
+  { route: '/__nuxt_error', handler: _lazy_9cOspZ, lazy: true, middleware: false, method: undefined },
   { route: '/__nuxt_island/**', handler: _SxA8c9, lazy: false, middleware: false, method: undefined },
-  { route: '/**', handler: _lazy_OES6i7, lazy: true, middleware: false, method: undefined }
+  { route: '/**', handler: _lazy_9cOspZ, lazy: true, middleware: false, method: undefined }
 ];
 
 function createNitroApp() {

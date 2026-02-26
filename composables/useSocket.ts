@@ -1,11 +1,11 @@
-import { ref } from 'vue'
 import { io, Socket } from 'socket.io-client'
 
 // Singleton socket instance — persists across page navigations
 let socket: Socket | null = null
-const isConnected = ref(false)
 
 export const useSocket = () => {
+  const socketStore = useSocketStore()
+
   const connect = (token: string) => {
     if (socket?.connected) return
 
@@ -20,11 +20,11 @@ export const useSocket = () => {
     })
 
     socket.on('connect', () => {
-      isConnected.value = true
+      socketStore.setConnected(true)
     })
 
     socket.on('disconnect', () => {
-      isConnected.value = false
+      socketStore.setConnected(false)
     })
   }
 
@@ -32,7 +32,7 @@ export const useSocket = () => {
     if (socket) {
       socket.disconnect()
       socket = null
-      isConnected.value = false
+      socketStore.setConnected(false)
     }
   }
 
@@ -55,7 +55,7 @@ export const useSocket = () => {
   }
 
   return {
-    isConnected,
+    ...storeToRefs(socketStore),
     connect,
     disconnect,
     emit,

@@ -10,40 +10,40 @@
         <div class="auth-tabs">
           <button
             type="button"
-            :class="['tab', { active: mode === 'login' }]"
-            @click="mode = 'login'"
+            :class="['tab', { active: auth.authFormMode === 'login' }]"
+            @click="auth.authFormMode = 'login'"
           >
             Login
           </button>
           <button
             type="button"
-            :class="['tab', { active: mode === 'register' }]"
-            @click="mode = 'register'"
+            :class="['tab', { active: auth.authFormMode === 'register' }]"
+            @click="auth.authFormMode = 'register'"
           >
             Register
           </button>
         </div>
 
         <form @submit.prevent="handleSubmit">
-          <div class="form-group" v-if="mode === 'register'">
+          <div class="form-group" v-if="auth.authFormMode === 'register'">
             <label>Name</label>
-            <input v-model="form.name" type="text" class="input" placeholder="Your name" required />
+            <input v-model="auth.authForm.name" type="text" class="input" placeholder="Your name" required />
           </div>
 
           <div class="form-group">
             <label>Email</label>
-            <input v-model="form.email" type="email" class="input" placeholder="you@example.com" required />
+            <input v-model="auth.authForm.email" type="email" class="input" placeholder="you@example.com" required />
           </div>
 
           <div class="form-group">
             <label>Password</label>
-            <input v-model="form.password" type="password" class="input" placeholder="Min 6 characters" required />
+            <input v-model="auth.authForm.password" type="password" class="input" placeholder="Min 6 characters" required />
           </div>
 
-          <p v-if="errorMsg" class="error-text">{{ errorMsg }}</p>
+          <p v-if="auth.authFormError" class="error-text">{{ auth.authFormError }}</p>
 
-          <button type="submit" class="btn btn-primary" style="width: 100%" :disabled="loading">
-            {{ loading ? 'Please wait...' : (mode === 'login' ? 'Login' : 'Create Account') }}
+          <button type="submit" class="btn btn-primary" style="width: 100%" :disabled="auth.authFormLoading">
+            {{ auth.authFormLoading ? 'Please wait...' : (auth.authFormMode === 'login' ? 'Login' : 'Create Account') }}
           </button>
         </form>
       </div>
@@ -57,16 +57,6 @@ definePageMeta({ layout: 'default' })
 const auth = useAuthStore()
 const router = useRouter()
 
-const mode = ref<'login' | 'register'>('login')
-const loading = ref(false)
-const errorMsg = ref('')
-
-const form = reactive({
-  name: '',
-  email: '',
-  password: '',
-})
-
 // Redirect if already logged in (auth already loaded by plugin)
 onMounted(() => {
   if (auth.isLoggedIn) {
@@ -75,20 +65,16 @@ onMounted(() => {
 })
 
 const handleSubmit = async () => {
-  loading.value = true
-  errorMsg.value = ''
-
+  auth.clearAuthForm()
   try {
-    if (mode.value === 'register') {
-      await auth.register(form.name, form.email, form.password)
+    if (auth.authFormMode === 'register') {
+      await auth.register(auth.authForm.name, auth.authForm.email, auth.authForm.password)
     } else {
-      await auth.login(form.email, form.password)
+      await auth.login(auth.authForm.email, auth.authForm.password)
     }
     router.push('/dashboard')
-  } catch (err: any) {
-    errorMsg.value = err?.data?.message || err?.message || 'Something went wrong'
-  } finally {
-    loading.value = false
+  } catch {
+    // Error already set in store
   }
 }
 </script>

@@ -3,8 +3,8 @@
     <div class="dashboard-header">
       <h2>Location History</h2>
       <div class="view-toggle">
-        <button :class="['tab-btn', { active: viewMode === 'sessions' }]" @click="viewMode = 'sessions'">Sessions</button>
-        <button :class="['tab-btn', { active: viewMode === 'points' }]" @click="viewMode = 'points'">All Points</button>
+        <button :class="['tab-btn', { active: history.viewMode === 'sessions' }]" @click="history.viewMode = 'sessions'">Sessions</button>
+        <button :class="['tab-btn', { active: history.viewMode === 'points' }]" @click="history.viewMode = 'points'">All Points</button>
       </div>
     </div>
 
@@ -13,7 +13,7 @@
       <div class="filter-row">
         <div class="form-group" style="margin-bottom: 0;">
           <label>Device</label>
-          <select v-model="filterDeviceId" class="input">
+          <select v-model="history.filterDeviceId" class="input">
             <option value="">All Devices</option>
             <option v-for="device in auth.devices" :key="device.id" :value="device.id">
               {{ device.name }} ({{ device.deviceType === 'laptop' ? device.identifier?.slice(-6) : device.imei?.slice(-4) }})
@@ -22,13 +22,13 @@
         </div>
         <div class="form-group" style="margin-bottom: 0;">
           <label>From</label>
-          <input v-model="dateFrom" type="date" class="input" />
+          <input v-model="history.dateFrom" type="date" class="input" />
         </div>
         <div class="form-group" style="margin-bottom: 0;">
           <label>To</label>
-          <input v-model="dateTo" type="date" class="input" />
+          <input v-model="history.dateTo" type="date" class="input" />
         </div>
-        <button class="btn btn-primary" @click="fetchData" style="align-self: flex-end;">
+        <button class="btn btn-primary" @click="history.fetchData()" style="align-self: flex-end;">
           Filter
         </button>
       </div>
@@ -40,28 +40,28 @@
     </div>
 
     <!-- Sessions View -->
-    <div v-if="viewMode === 'sessions'" class="card">
+    <div v-if="history.viewMode === 'sessions'" class="card">
       <h3 style="margin-bottom: 1rem;">
         Tracking Sessions
         <span style="color: var(--text-muted); font-weight: normal; font-size: 0.875rem;">
-          ({{ sessions.length }})
+          ({{ history.sessions.length }})
         </span>
       </h3>
 
-      <div v-if="loading" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+      <div v-if="history.loading" style="text-align: center; padding: 2rem; color: var(--text-muted);">
         Loading...
       </div>
 
-      <div v-else-if="sessions.length === 0" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+      <div v-else-if="history.sessions.length === 0" style="text-align: center; padding: 2rem; color: var(--text-muted);">
         No sessions found for this period.
       </div>
 
       <div v-else class="session-list">
         <div
-          v-for="session in sessions"
+          v-for="session in history.sessions"
           :key="session.id"
-          :class="['session-card', { selected: selectedSessionId === session.id }]"
-          @click="selectSession(session)"
+          :class="['session-card', { selected: history.selectedSessionId === session.id }]"
+          @click="history.selectSession(session)"
         >
           <div class="session-card-header">
             <strong>{{ session.deviceName || 'Unknown Device' }}</strong>
@@ -96,19 +96,19 @@
     </div>
 
     <!-- Points View -->
-    <div v-if="viewMode === 'points'" class="card">
+    <div v-if="history.viewMode === 'points'" class="card">
       <h3 style="margin-bottom: 1rem;">
         Location Points
         <span style="color: var(--text-muted); font-weight: normal; font-size: 0.875rem;">
-          ({{ locations.length }} records)
+          ({{ history.locations.length }} records)
         </span>
       </h3>
 
-      <div v-if="loading" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+      <div v-if="history.loading" style="text-align: center; padding: 2rem; color: var(--text-muted);">
         Loading...
       </div>
 
-      <div v-else-if="locations.length === 0" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+      <div v-else-if="history.locations.length === 0" style="text-align: center; padding: 2rem; color: var(--text-muted);">
         No location data for this period.
       </div>
 
@@ -124,7 +124,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="loc in locations" :key="loc.id">
+            <tr v-for="loc in history.locations" :key="loc.id">
               <td>{{ formatTime(loc.timestamp) }}</td>
               <td>{{ loc.latitude.toFixed(6) }}</td>
               <td>{{ loc.longitude.toFixed(6) }}</td>
@@ -145,44 +145,10 @@ definePageMeta({
   middleware: 'auth',
 })
 
-interface HistoryLocation {
-  id: string
-  latitude: number
-  longitude: number
-  accuracy?: number
-  speed?: number
-  heading?: number
-  altitude?: number
-  timestamp: string
-}
-
-interface Session {
-  id: string
-  deviceName: string
-  imei: string
-  status: string
-  startedAt: string
-  stoppedAt: string
-  duration: number
-  totalDistance: number
-  pointCount: number
-}
-
-const { store: auth, authFetch } = useAuth()
+const auth = useAuthStore()
+const history = useHistoryStore()
 
 const historyMapRef = ref<HTMLElement | null>(null)
-const locations = ref<HistoryLocation[]>([])
-const sessions = ref<Session[]>([])
-const loading = ref(false)
-const filterDeviceId = ref('')
-const viewMode = ref<'sessions' | 'points'>('sessions')
-const selectedSessionId = ref<string | null>(null)
-
-const today = new Date()
-const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
-const dateTo = ref(today.toISOString().split('T')[0])
-const dateFrom = ref(weekAgo.toISOString().split('T')[0])
-
 let map: any = null
 let polyline: any = null
 let markers: any[] = []
@@ -205,57 +171,6 @@ const formatDistance = (meters: number) => {
   return `${(meters / 1000).toFixed(2)} km`
 }
 
-const fetchSessions = async () => {
-  try {
-    let url = `/api/sessions?from=${dateFrom.value}&to=${dateTo.value}`
-    if (filterDeviceId.value) url += `&deviceId=${filterDeviceId.value}`
-    const data = await authFetch<Session[]>(url)
-    sessions.value = data || []
-  } catch {
-    sessions.value = []
-  }
-}
-
-const fetchLocations = async () => {
-  try {
-    let url = `/api/location/history/${auth.user?.id}?from=${dateFrom.value}&to=${dateTo.value}`
-    if (filterDeviceId.value) url += `&deviceId=${filterDeviceId.value}`
-    if (selectedSessionId.value) url += `&sessionId=${selectedSessionId.value}`
-    const data = await authFetch<HistoryLocation[]>(url)
-    locations.value = data || []
-    drawRoute()
-  } catch {
-    locations.value = []
-  }
-}
-
-const fetchData = async () => {
-  loading.value = true
-  selectedSessionId.value = null
-  await Promise.all([fetchSessions(), fetchLocations()])
-  loading.value = false
-}
-
-const selectSession = async (session: Session) => {
-  if (selectedSessionId.value === session.id) {
-    selectedSessionId.value = null
-    await fetchLocations()
-    return
-  }
-  selectedSessionId.value = session.id
-  loading.value = true
-
-  try {
-    const data = await authFetch<{ locations: HistoryLocation[] }>(`/api/session/${session.id}`)
-    locations.value = data?.locations || []
-    drawRoute()
-  } catch {
-    locations.value = []
-  } finally {
-    loading.value = false
-  }
-}
-
 const drawRoute = async () => {
   if (!import.meta.client || !historyMapRef.value) return
 
@@ -272,9 +187,9 @@ const drawRoute = async () => {
   markers = []
   if (polyline) polyline.remove()
 
-  if (locations.value.length === 0) return
+  if (history.locations.length === 0) return
 
-  const points: [number, number][] = locations.value.map((loc) => [loc.latitude, loc.longitude])
+  const points: [number, number][] = history.locations.map((loc) => [loc.latitude, loc.longitude])
 
   polyline = L.polyline(points, {
     color: '#10b981',
@@ -297,13 +212,13 @@ const drawRoute = async () => {
   if (points.length > 0) {
     const startMarker = L.marker(points[0], { icon: startIcon })
       .addTo(map)
-      .bindPopup('Start: ' + formatTime(locations.value[0].timestamp))
+      .bindPopup('Start: ' + formatTime(history.locations[0].timestamp))
     markers.push(startMarker)
 
     if (points.length > 1) {
       const endMarker = L.marker(points[points.length - 1], { icon: endIcon })
         .addTo(map)
-        .bindPopup('End: ' + formatTime(locations.value[locations.value.length - 1].timestamp))
+        .bindPopup('End: ' + formatTime(history.locations[history.locations.length - 1].timestamp))
       markers.push(endMarker)
     }
   }
@@ -311,9 +226,11 @@ const drawRoute = async () => {
   map.fitBounds(polyline.getBounds(), { padding: [20, 20] })
 }
 
-watch(viewMode, () => {
-  if (viewMode.value === 'points' && locations.value.length === 0) {
-    fetchLocations()
+watch(() => history.locations, drawRoute, { deep: true })
+
+watch(() => history.viewMode, () => {
+  if (history.viewMode === 'points' && history.locations.length === 0) {
+    history.fetchLocations()
   }
 })
 
@@ -321,7 +238,9 @@ onMounted(async () => {
   try {
     await auth.fetchDevices()
   } catch {}
-  fetchData()
+  await history.fetchData()
+  await nextTick()
+  drawRoute()
 })
 
 onUnmounted(() => {
