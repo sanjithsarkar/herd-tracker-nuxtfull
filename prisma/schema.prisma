@@ -1,0 +1,96 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum DeviceType {
+  mobile
+  laptop
+}
+
+enum SessionStatus {
+  active
+  stopped
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  devices   Device[]
+  locations Location[]
+  sessions  TrackingSession[]
+}
+
+model Device {
+  id         String     @id @default(uuid())
+  userId     String
+  user       User       @relation(fields: [userId], references: [id])
+  deviceType DeviceType @default(mobile)
+  imei       String?    @unique
+  identifier String?    @unique
+  name       String     @default("My Device")
+  isActive   Boolean    @default(true)
+  lastSeen   DateTime?
+  createdAt  DateTime   @default(now())
+
+  locations Location[]
+  sessions  TrackingSession[]
+
+  @@index([userId])
+}
+
+model Location {
+  id           String           @id @default(uuid())
+  userId       String
+  user         User             @relation(fields: [userId], references: [id])
+  deviceId     String?
+  device       Device?          @relation(fields: [deviceId], references: [id])
+  sessionId    String?
+  session      TrackingSession? @relation(fields: [sessionId], references: [id])
+  imei         String?
+  latitude     Float
+  longitude    Float
+  accuracy     Float            @default(0)
+  speed        Float?
+  heading      Float?
+  altitude     Float?
+  batteryLevel Float?
+  timestamp    DateTime         @default(now())
+
+  @@index([userId, timestamp(sort: Desc)])
+  @@index([deviceId, timestamp(sort: Desc)])
+  @@index([sessionId, timestamp])
+}
+
+model TrackingSession {
+  id             String        @id @default(uuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
+  deviceId       String?
+  device         Device?       @relation(fields: [deviceId], references: [id])
+  imei           String?
+  deviceName     String        @default("Unknown Device")
+  status         SessionStatus @default(active)
+  startedAt      DateTime      @default(now())
+  stoppedAt      DateTime?
+  duration       Int           @default(0)
+  totalDistance   Float         @default(0)
+  pointCount     Int           @default(0)
+  startLatitude  Float?
+  startLongitude Float?
+  lastLatitude   Float?
+  lastLongitude  Float?
+
+  locations Location[]
+
+  @@index([userId, startedAt(sort: Desc)])
+  @@index([deviceId, startedAt(sort: Desc)])
+}

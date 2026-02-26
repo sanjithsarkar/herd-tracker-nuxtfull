@@ -1,0 +1,51 @@
+import { d as defineEventHandler, g as getRouterParam, c as createError, p as prisma, r as readBody } from '../../../nitro/nitro.mjs';
+import 'node:http';
+import 'node:https';
+import 'node:events';
+import 'node:buffer';
+import 'node:fs';
+import 'node:path';
+import 'node:crypto';
+import 'socket.io';
+import '@prisma/client';
+import 'jsonwebtoken';
+import 'node:url';
+
+const _id__put = defineEventHandler(async (event) => {
+  const user = event.context.user;
+  const id = getRouterParam(event, "id");
+  if (!id) {
+    throw createError({
+      statusCode: 400,
+      message: "Device ID is required"
+    });
+  }
+  const device = await prisma.device.findUnique({
+    where: { id }
+  });
+  if (!device) {
+    throw createError({
+      statusCode: 404,
+      message: "Device not found"
+    });
+  }
+  if (device.userId !== user.id) {
+    throw createError({
+      statusCode: 403,
+      message: "Not authorized to update this device"
+    });
+  }
+  const body = await readBody(event);
+  const { name, isActive } = body;
+  const updateData = {};
+  if (name !== void 0) updateData.name = name;
+  if (isActive !== void 0) updateData.isActive = isActive;
+  const updatedDevice = await prisma.device.update({
+    where: { id },
+    data: updateData
+  });
+  return updatedDevice;
+});
+
+export { _id__put as default };
+//# sourceMappingURL=_id_.put.mjs.map
