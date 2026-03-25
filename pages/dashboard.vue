@@ -42,6 +42,23 @@
             <span class="info-label">Longitude</span>
             <span>{{ dashboard.latestLocation.longitude.toFixed(6) }}</span>
           </div>
+          <div class="info-row map-row">
+            <span class="info-label">Google Maps</span>
+            <a
+              :href="googleMapsUrl(dashboard.latestLocation.latitude, dashboard.latestLocation.longitude)"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="map-link"
+              :title="`Open ${dashboard.latestLocation.latitude}, ${dashboard.latestLocation.longitude} in Google Maps`"
+            >
+              <!-- <span class="sr-only">Open in Google Maps</span> -->
+              <svg class="map-pin-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <!-- <span class="map-link-text">Open in Maps</span> -->
+            </a>
+          </div>
           <div class="info-row">
             <span class="info-label">Accuracy</span>
             <span>{{ dashboard.latestLocation.accuracy?.toFixed(1) || 'N/A' }}m</span>
@@ -109,6 +126,9 @@ let defaultMarker: any = null
 const formatTime = (ts: string | number) => {
   return new Date(ts).toLocaleString()
 }
+
+const googleMapsUrl = (latitude: number, longitude: number) =>
+  `https://www.google.com/maps?q=${latitude},${longitude}`
 
 const getDeviceColor = (deviceId: string | undefined) => {
   if (!deviceId) return markerColors[0]
@@ -283,5 +303,45 @@ onUnmounted(() => {
   height: 10px;
   border-radius: 50%;
   flex-shrink: 0;
+}
+
+.map-row .map-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0;
+  color: var(--primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--radius);
+  transition: color 0.15s, background 0.15s;
+}
+
+.map-row .map-link:hover {
+  color: #34a853;
+}
+
+.map-pin-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.map-link-text {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 </style>

@@ -121,6 +121,7 @@
               <th>Longitude</th>
               <th>Speed</th>
               <th>Accuracy</th>
+              <th>Google Maps</th>
             </tr>
           </thead>
           <tbody>
@@ -130,6 +131,22 @@
               <td>{{ loc.longitude.toFixed(6) }}</td>
               <td>{{ loc.speed != null ? (loc.speed * 3.6).toFixed(1) + ' km/h' : '-' }}</td>
               <td>{{ loc.accuracy?.toFixed(1) || 'N/A' }}m</td>
+              <td class="map-cell">
+                <a
+                  :href="googleMapsUrl(loc.latitude, loc.longitude)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="map-link"
+                  :title="`Open ${loc.latitude}, ${loc.longitude} in Google Maps`"
+                  @click.stop
+                >
+                  <span class="sr-only">Open in Google Maps</span>
+                  <svg class="map-pin-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                </a>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -154,6 +171,9 @@ let polyline: any = null
 let markers: any[] = []
 
 const formatTime = (ts: string) => new Date(ts).toLocaleString()
+
+const googleMapsUrl = (latitude: number, longitude: number) =>
+  `https://www.google.com/maps?q=${latitude},${longitude}`
 
 const formatDuration = (seconds: number) => {
   if (!seconds) return '0s'
@@ -368,5 +388,44 @@ onUnmounted(() => {
 
 .history-table tbody tr:hover {
   background: rgba(255, 255, 255, 0.02);
+}
+
+.map-cell {
+  width: 4rem;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.map-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem;
+  color: var(--primary);
+  border-radius: var(--radius);
+  transition: color 0.15s, background 0.15s;
+}
+
+.map-link:hover {
+  color: #34a853;
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.map-pin-icon {
+  width: 1.35rem;
+  height: 1.35rem;
+  flex-shrink: 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 </style>
