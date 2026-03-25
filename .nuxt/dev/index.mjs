@@ -2135,11 +2135,10 @@ const verifyToken = (token) => {
   return jwt.verify(token, config.jwtSecret);
 };
 
-let io;
-const _sKBvAAJXKR8m2OJWympHLqpwkOqXrFrRSq10bpHmvM = defineNitroPlugin((nitroApp) => {
-  var _a, _b;
-  const server = ((_b = (_a = nitroApp.h3App) == null ? void 0 : _a.websocket) == null ? void 0 : _b.server) || nitroApp.h3App;
-  io = new Server(server, {
+let io = null;
+function initSocketServer(httpServer) {
+  if (io) return io;
+  io = new Server(httpServer, {
     cors: {
       origin: "*",
       methods: ["GET", "POST"]
@@ -2147,9 +2146,9 @@ const _sKBvAAJXKR8m2OJWympHLqpwkOqXrFrRSq10bpHmvM = defineNitroPlugin((nitroApp)
     serveClient: false
   });
   io.use(async (socket, next) => {
-    var _a2, _b2;
+    var _a, _b;
     try {
-      const token = ((_a2 = socket.handshake.auth) == null ? void 0 : _a2.token) || ((_b2 = socket.handshake.query) == null ? void 0 : _b2.token);
+      const token = ((_a = socket.handshake.auth) == null ? void 0 : _a.token) || ((_b = socket.handshake.query) == null ? void 0 : _b.token);
       if (!token) {
         return next(new Error("Authentication token required"));
       }
@@ -2227,6 +2226,20 @@ const _sKBvAAJXKR8m2OJWympHLqpwkOqXrFrRSq10bpHmvM = defineNitroPlugin((nitroApp)
     });
   });
   console.log("[Socket.IO] Server initialized");
+  return io;
+}
+
+let initialized = false;
+const _sKBvAAJXKR8m2OJWympHLqpwkOqXrFrRSq10bpHmvM = defineNitroPlugin((nitroApp) => {
+  nitroApp.hooks.hook("request", (event) => {
+    var _a, _b, _c;
+    if (initialized) return;
+    initialized = true;
+    const httpServer = (_c = (_b = (_a = event.node) == null ? void 0 : _a.req) == null ? void 0 : _b.socket) == null ? void 0 : _c.server;
+    if (httpServer) {
+      initSocketServer(httpServer);
+    }
+  });
 });
 
 const plugins = [

@@ -48,6 +48,7 @@ declare global {
   const getCookie: typeof import('../../node_modules/h3').getCookie
   const getHeader: typeof import('../../node_modules/h3').getHeader
   const getHeaders: typeof import('../../node_modules/h3').getHeaders
+  const getIO: typeof import('../../server/utils/socketServer').getIO
   const getMethod: typeof import('../../node_modules/h3').getMethod
   const getProxyRequestHeaders: typeof import('../../node_modules/h3').getProxyRequestHeaders
   const getQuery: typeof import('../../node_modules/h3').getQuery
@@ -73,6 +74,7 @@ declare global {
   const handleCacheHeaders: typeof import('../../node_modules/h3').handleCacheHeaders
   const handleCors: typeof import('../../node_modules/h3').handleCors
   const haversine: typeof import('../../server/utils/haversine').haversine
+  const initSocketServer: typeof import('../../server/utils/socketServer').initSocketServer
   const isCorsOriginAllowed: typeof import('../../node_modules/h3').isCorsOriginAllowed
   const isError: typeof import('../../node_modules/h3').isError
   const isEvent: typeof import('../../node_modules/h3').isEvent
@@ -154,3 +156,4 @@ export { defineAppConfig } from '/Users/sanjithsarkar/Documents/herd/nextjs/herd
 export { haversine } from '/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/server/utils/haversine';
 export { signToken, verifyToken } from '/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/server/utils/jwt';
 export { default as prisma } from '/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/server/utils/prisma';
+export { getIO, initSocketServer } from '/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/server/utils/socketServer';
