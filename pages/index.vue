@@ -65,13 +65,14 @@ onMounted(() => {
 })
 
 const handleSubmit = async () => {
-  auth.clearAuthForm()
+  // Do not call clearAuthForm() here — it wipes name/email/password before the request.
   try {
     if (auth.authFormMode === 'register') {
       await auth.register(auth.authForm.name, auth.authForm.email, auth.authForm.password)
     } else {
       await auth.login(auth.authForm.email, auth.authForm.password)
     }
+    auth.clearAuthForm()
     router.push('/dashboard')
   } catch {
     // Error already set in store
