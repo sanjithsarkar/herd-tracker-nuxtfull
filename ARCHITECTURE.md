@@ -76,17 +76,18 @@ herd-tracker-nuxtfull/
 │
 ├── plugins/
 │   ├── 00.auth.client.ts            # Loads auth from localStorage before middleware
-│   └── tracking.client.ts           # Restores socket + tracking on refresh
+│   └── tracking.client.ts           # Connects socket + restores tracking on refresh
 │
 └── server/
     ├── middleware/
     │   └── auth.ts                  # JWT verification for API routes
     ├── plugins/
-    │   └── socket.ts                # Socket.IO server initialization
+    │   └── socket.ts                # Socket.IO lazy init (hooks first request → socketServer.ts)
     ├── utils/
     │   ├── prisma.ts                # PrismaClient singleton
     │   ├── jwt.ts                   # signToken / verifyToken helpers
-    │   └── haversine.ts             # Distance calculation (meters)
+    │   ├── haversine.ts             # Distance calculation (meters)
+    │   └── socketServer.ts          # Socket.IO server init (lazy, attached on first request)
     └── api/
         ├── auth/
         │   ├── login.post.ts        # POST /api/auth/login
@@ -465,9 +466,10 @@ Standalone geolocation API wrapper (not currently used by stores — tracking st
 - Executes **before middleware**, so route guards can check auth
 
 #### `plugins/tracking.client.ts`
-- If user is logged in: connects Socket.IO with token
+- If user is logged in: connects Socket.IO with token via `useSocket().connect()`
 - Checks localStorage for `tracking_active`
 - If found: resumes tracking (starts fresh geolocation watch with saved session)
+- **Note:** Socket connection was previously in a separate `01.socket.client.ts` plugin, now consolidated here
 
 ### Middleware
 
@@ -493,10 +495,12 @@ Standalone geolocation API wrapper (not currently used by stores — tracking st
 | `server/utils/prisma.ts` | `default` (PrismaClient)          | Singleton database client    |
 | `server/utils/jwt.ts`    | `signToken()`, `verifyToken()`    | JWT sign (30d) / verify      |
 | `server/utils/haversine.ts` | `haversine(lat1,lon1,lat2,lon2)` | Distance in meters          |
+| `server/utils/socketServer.ts` | `initSocketServer()`, `getIO()` | Socket.IO server setup (lazy init on first HTTP request) |
 
-### Socket.IO Server (`server/plugins/socket.ts`)
+### Socket.IO Server (`server/plugins/socket.ts` + `server/utils/socketServer.ts`)
 
-- Initializes Socket.IO on the Nitro HTTP server
+- **Lazy initialization:** The Nitro plugin hooks into the first HTTP `request` event to grab the Node.js HTTP server (`req.socket.server`), then passes it to `initSocketServer()` which attaches Socket.IO once
+- **Why lazy?** In Nitro 2.x, the HTTP server is not available at plugin init time (`nitroApp.h3App` does not expose it). The request hook reliably captures it on first request
 - CORS: allows all origins
 - Auth middleware: validates JWT before socket connection
 - On connection: joins user room (`user:{userId}`)

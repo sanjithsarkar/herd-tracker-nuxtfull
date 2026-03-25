@@ -1,122 +1,17 @@
-import { Server as SocketIOServer } from 'socket.io'
-import prisma from '~/server/utils/prisma'
-import { verifyToken } from '~/server/utils/jwt'
+import { initSocketServer } from '~/server/utils/socketServer'
+import type { Server as HttpServer } from 'http'
 
-let io: SocketIOServer
-
-export const getIO = () => io
+let initialized = false
 
 export default defineNitroPlugin((nitroApp) => {
-  // @ts-ignore - accessing internal h3 server
-  const server = nitroApp.h3App?.websocket?.server || nitroApp.h3App
+  // Use the 'request' hook to grab the Node.js HTTP server on the first request
+  nitroApp.hooks.hook('request', (event) => {
+    if (initialized) return
+    initialized = true
 
-  io = new SocketIOServer(server, {
-    cors: {
-      origin: '*',
-      methods: ['GET', 'POST'],
-    },
-    serveClient: false,
-  })
-
-  // Authentication middleware for Socket.IO
-  io.use(async (socket, next) => {
-    try {
-      const token = socket.handshake.auth?.token || socket.handshake.query?.token
-
-      if (!token) {
-        return next(new Error('Authentication token required'))
-      }
-
-      const decoded = verifyToken(token as string)
-
-      const user = await prisma.user.findUnique({
-        where: { id: decoded.id },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      })
-
-      if (!user) {
-        return next(new Error('User not found'))
-      }
-
-      socket.data.user = user
-      next()
-    } catch (error) {
-      next(new Error('Invalid authentication token'))
+    const httpServer = (event.node?.req?.socket as any)?.server as HttpServer | undefined
+    if (httpServer) {
+      initSocketServer(httpServer)
     }
   })
-
-  io.on('connection', (socket) => {
-    const user = socket.data.user
-    console.log(`[Socket.IO] User connected: ${user.id}`)
-
-    // Join user-specific room
-    socket.join(`user:${user.id}`)
-
-    // Listen for location updates
-    socket.on('location:update', async (data) => {
-      try {
-        const {
-          latitude,
-          longitude,
-          accuracy,
-          imei,
-          identifier,
-          sessionId,
-          speed,
-          heading,
-          altitude,
-          batteryLevel,
-        } = data
-
-        // Resolve device
-        let device = null
-        if (imei) {
-          device = await prisma.device.findUnique({ where: { imei } })
-        } else if (identifier) {
-          device = await prisma.device.findUnique({ where: { identifier } })
-        }
-
-        // Update device lastSeen
-        if (device) {
-          await prisma.device.update({
-            where: { id: device.id },
-            data: { lastSeen: new Date() },
-          })
-        }
-
-        // Save location to database
-        const location = await prisma.location.create({
-          data: {
-            userId: user.id,
-            deviceId: device?.id || null,
-            sessionId: sessionId || null,
-            imei: imei || null,
-            latitude,
-            longitude,
-            accuracy: accuracy || 0,
-            speed: speed ?? null,
-            heading: heading ?? null,
-            altitude: altitude ?? null,
-            batteryLevel: batteryLevel ?? null,
-          },
-        })
-
-        // Broadcast to user room
-        io.to(`user:${user.id}`).emit('location:updated', location)
-      } catch (error) {
-        console.error('[Socket.IO] Error saving location:', error)
-        socket.emit('location:error', { message: 'Failed to save location' })
-      }
-    })
-
-    socket.on('disconnect', () => {
-      console.log(`[Socket.IO] User disconnected: ${user.id}`)
-    })
-  })
-
-  console.log('[Socket.IO] Server initialized')
 })
