@@ -2,6 +2,7 @@ interface User {
   id: string
   name: string
   email: string
+  role?: 'USER' | 'ADMIN' | 'SUPER_ADMIN'
 }
 
 interface Device {
@@ -34,6 +35,8 @@ export const useAuthStore = defineStore('auth', {
 
   getters: {
     isLoggedIn: (state) => !!state.token,
+    isAdmin: (state) => state.user?.role === 'ADMIN' || state.user?.role === 'SUPER_ADMIN',
+    isSuperAdmin: (state) => state.user?.role === 'SUPER_ADMIN',
     selectedDevice: (state) => state.devices.find((d) => d.id === state.selectedDeviceId) || null,
   },
 
@@ -51,16 +54,13 @@ export const useAuthStore = defineStore('auth', {
       this.authFormLoading = true
       this.authFormError = ''
       try {
-        const res = await $fetch<{ token: string; user: User }>('/api/auth/register', {
+        const res = await $fetch<{ success: boolean; message: string; user: User }>('/api/auth/register', {
           method: 'POST',
           body: { name, email, password },
         })
-        this.token = res.token
-        this.user = res.user
-        if (import.meta.client) {
-          localStorage.setItem('token', res.token)
-          localStorage.setItem('user', JSON.stringify(res.user))
-        }
+        // No token — user must wait for admin approval
+        // Return the message so the UI can show it
+        return res
       } catch (err: any) {
         this.authFormError = err?.data?.message || err?.message || 'Something went wrong'
         throw err

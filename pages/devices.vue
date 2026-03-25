@@ -122,7 +122,7 @@
               >
                 {{ device.isActive ? 'Disable' : 'Enable' }}
               </button>
-              <button class="btn-icon danger" title="Delete" @click="deleteDevice(device.id)">
+              <button class="btn-icon danger" title="Delete" @click="openDeleteDevice(device)">
                 Delete
               </button>
             </template>
@@ -134,6 +134,24 @@
         </div>
       </div>
     </div>
+
+    <ConfirmDialog
+      v-model="deviceDeleteOpen"
+      title="Remove this device?"
+      variant="danger"
+      confirm-label="Remove device"
+      cancel-label="Cancel"
+      :loading="deviceDeleteLoading"
+      loading-label="Removing…"
+      @confirm="runDeleteDevice"
+    >
+      <template #default>
+        <p v-if="deviceToDelete" class="device-modal-lead">
+          <strong>{{ deviceToDelete.name }}</strong> will be removed from your account.
+        </p>
+        <p class="device-modal-hint">You can register the device again later if needed.</p>
+      </template>
+    </ConfirmDialog>
   </div>
 </template>
 
@@ -195,9 +213,25 @@ const toggleActive = async (device: any) => {
   await auth.updateDevice(device.id, { isActive: !device.isActive })
 }
 
-const deleteDevice = async (deviceId: string) => {
-  if (!confirm('Are you sure you want to remove this device?')) return
-  await auth.removeDevice(deviceId)
+const deviceDeleteOpen = ref(false)
+const deviceToDelete = ref<{ id: string; name: string } | null>(null)
+const deviceDeleteLoading = ref(false)
+
+const openDeleteDevice = (device: { id: string; name: string }) => {
+  deviceToDelete.value = device
+  deviceDeleteOpen.value = true
+}
+
+const runDeleteDevice = async () => {
+  if (!deviceToDelete.value) return
+  deviceDeleteLoading.value = true
+  try {
+    await auth.removeDevice(deviceToDelete.value.id)
+    deviceDeleteOpen.value = false
+    deviceToDelete.value = null
+  } finally {
+    deviceDeleteLoading.value = false
+  }
 }
 </script>
 
@@ -277,5 +311,18 @@ const deleteDevice = async (deviceId: string) => {
   border-radius: 9999px;
   font-size: 0.7rem;
   font-weight: 600;
+}
+
+.device-modal-lead {
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.device-modal-hint {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.45;
 }
 </style>

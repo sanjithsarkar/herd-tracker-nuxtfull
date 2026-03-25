@@ -33,6 +33,14 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Check if user account is approved/active
+  if (!user.isActive) {
+    throw createError({
+      statusCode: 403,
+      message: 'Your account is pending admin approval. Please wait for an admin to activate your account.',
+    })
+  }
+
   const token = signToken(user.id)
 
   return {
@@ -41,6 +49,7 @@ export default defineEventHandler(async (event) => {
       id: user.id,
       name: user.name,
       email: user.email,
+      role: user.role,
     },
   }
 })

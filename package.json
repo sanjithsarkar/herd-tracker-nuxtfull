@@ -24,11 +24,15 @@
     "socket.io": "^4.8.3",
     "socket.io-client": "^4.8.3"
   },
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
+  },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/leaflet": "^1.9.21",
     "prisma": "^6.19.2",
+    "tsx": "^4.19.0",
     "typescript": "^5.9.3"
   }
 }

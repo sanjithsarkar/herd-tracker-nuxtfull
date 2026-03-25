@@ -2234,7 +2234,22 @@ const plugins = [
 _sKBvAAJXKR8m2OJWympHLqpwkOqXrFrRSq10bpHmvM
 ];
 
-const assets = {};
+const assets = {
+  "/index.mjs": {
+    "type": "text/javascript; charset=utf-8",
+    "etag": "\"2210a-7OGwh4crsE/5Ned2+bXYaKWmWxI\"",
+    "mtime": "2026-03-25T22:13:19.879Z",
+    "size": 139530,
+    "path": "index.mjs"
+  },
+  "/index.mjs.map": {
+    "type": "application/json",
+    "etag": "\"826f7-e34v/iFUlBkZ1vvXx7eo7cWgC4U\"",
+    "mtime": "2026-03-25T22:13:19.880Z",
+    "size": 534263,
+    "path": "index.mjs.map"
+  }
+};
 
 function readAsset (id) {
   const serverDir = dirname$1(fileURLToPath(globalThis._importMeta_.url));
@@ -2348,6 +2363,8 @@ const _gFhG3L = defineEventHandler(async (event) => {
         id: true,
         name: true,
         email: true,
+        role: true,
+        isActive: true,
         createdAt: true
       }
     });
@@ -2728,6 +2745,10 @@ async function getIslandContext(event) {
 	return ctx;
 }
 
+const _lazy_16FMCG = () => Promise.resolve().then(function () { return users_get$1; });
+const _lazy_Sgpy92 = () => Promise.resolve().then(function () { return _id__delete$5; });
+const _lazy_GcYb9K = () => Promise.resolve().then(function () { return role_patch$1; });
+const _lazy_1uG4wB = () => Promise.resolve().then(function () { return status_patch$1; });
 const _lazy_yBTCVr = () => Promise.resolve().then(function () { return login_post$1; });
 const _lazy_BJxtFC = () => Promise.resolve().then(function () { return register_post$1; });
 const _lazy_WtKpFX = () => Promise.resolve().then(function () { return _id__delete$3; });
@@ -2749,6 +2770,10 @@ const _lazy_9cOspZ = () => Promise.resolve().then(function () { return renderer$
 const handlers = [
   { route: '', handler: _Psbl7H, lazy: false, middleware: true, method: undefined },
   { route: '', handler: _gFhG3L, lazy: false, middleware: true, method: undefined },
+  { route: '/api/admin/users', handler: _lazy_16FMCG, lazy: true, middleware: false, method: "get" },
+  { route: '/api/admin/users/:id', handler: _lazy_Sgpy92, lazy: true, middleware: false, method: "delete" },
+  { route: '/api/admin/users/:id/role', handler: _lazy_GcYb9K, lazy: true, middleware: false, method: "patch" },
+  { route: '/api/admin/users/:id/status', handler: _lazy_1uG4wB, lazy: true, middleware: false, method: "patch" },
   { route: '/api/auth/login', handler: _lazy_yBTCVr, lazy: true, middleware: false, method: "post" },
   { route: '/api/auth/register', handler: _lazy_BJxtFC, lazy: true, middleware: false, method: "post" },
   { route: '/api/device/:id', handler: _lazy_WtKpFX, lazy: true, middleware: false, method: "delete" },
@@ -3114,6 +3139,142 @@ const styles$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   default: styles
 }, Symbol.toStringTag, { value: 'Module' }));
 
+const ROLE_HIERARCHY = {
+  SUPER_ADMIN: 3,
+  ADMIN: 2,
+  USER: 1
+};
+function requireRole(event, minRole) {
+  const user = event.context.user;
+  if (!user) {
+    throw createError({ statusCode: 401, message: "Not authorized" });
+  }
+  const userLevel = ROLE_HIERARCHY[user.role] || 0;
+  const requiredLevel = ROLE_HIERARCHY[minRole];
+  if (userLevel < requiredLevel) {
+    throw createError({ statusCode: 403, message: "Insufficient permissions" });
+  }
+  return user;
+}
+function canManageUser(managerRole, targetRole) {
+  const managerLevel = ROLE_HIERARCHY[managerRole] || 0;
+  const targetLevel = ROLE_HIERARCHY[targetRole] || 0;
+  return managerLevel > targetLevel;
+}
+
+const users_get = defineEventHandler(async (event) => {
+  const admin = requireRole(event, "ADMIN");
+  const users = await prisma.user.findMany({
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      isActive: true,
+      createdAt: true
+    },
+    orderBy: { createdAt: "desc" }
+  });
+  const filteredUsers = users.filter((u) => u.id !== admin.id);
+  return filteredUsers;
+});
+
+const users_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: users_get
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const _id__delete$4 = defineEventHandler(async (event) => {
+  const admin = requireRole(event, "ADMIN");
+  const userId = getRouterParam(event, "id");
+  const targetUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, role: true, email: true }
+  });
+  if (!targetUser) {
+    throw createError({ statusCode: 404, message: "User not found" });
+  }
+  if (!canManageUser(admin.role, targetUser.role)) {
+    throw createError({ statusCode: 403, message: "Cannot delete a user with equal or higher role" });
+  }
+  await prisma.$transaction([
+    prisma.location.deleteMany({ where: { userId } }),
+    prisma.trackingSession.deleteMany({ where: { userId } }),
+    prisma.device.deleteMany({ where: { userId } }),
+    prisma.user.delete({ where: { id: userId } })
+  ]);
+  return { success: true, message: `User ${targetUser.email} deleted` };
+});
+
+const _id__delete$5 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: _id__delete$4
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const VALID_ROLES = ["USER", "ADMIN"];
+const role_patch = defineEventHandler(async (event) => {
+  const admin = requireRole(event, "ADMIN");
+  const userId = getRouterParam(event, "id");
+  const { role } = await readBody(event);
+  if (!VALID_ROLES.includes(role)) {
+    throw createError({ statusCode: 400, message: `Role must be one of: ${VALID_ROLES.join(", ")}` });
+  }
+  if (role === "ADMIN" && admin.role !== "SUPER_ADMIN") {
+    throw createError({ statusCode: 403, message: "Only Super Admin can assign Admin role" });
+  }
+  const targetUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, role: true }
+  });
+  if (!targetUser) {
+    throw createError({ statusCode: 404, message: "User not found" });
+  }
+  if (!canManageUser(admin.role, targetUser.role)) {
+    throw createError({ statusCode: 403, message: "Cannot manage a user with equal or higher role" });
+  }
+  const updated = await prisma.user.update({
+    where: { id: userId },
+    data: { role },
+    select: { id: true, name: true, email: true, role: true, isActive: true, createdAt: true }
+  });
+  return updated;
+});
+
+const role_patch$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: role_patch
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const status_patch = defineEventHandler(async (event) => {
+  const admin = requireRole(event, "ADMIN");
+  const userId = getRouterParam(event, "id");
+  const { isActive } = await readBody(event);
+  if (typeof isActive !== "boolean") {
+    throw createError({ statusCode: 400, message: "isActive must be a boolean" });
+  }
+  const targetUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, role: true }
+  });
+  if (!targetUser) {
+    throw createError({ statusCode: 404, message: "User not found" });
+  }
+  if (!canManageUser(admin.role, targetUser.role)) {
+    throw createError({ statusCode: 403, message: "Cannot manage a user with equal or higher role" });
+  }
+  const updated = await prisma.user.update({
+    where: { id: userId },
+    data: { isActive },
+    select: { id: true, name: true, email: true, role: true, isActive: true, createdAt: true }
+  });
+  return updated;
+});
+
+const status_patch$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: status_patch
+}, Symbol.toStringTag, { value: 'Module' }));
+
 const login_post = defineEventHandler(async (event) => {
   const body = await readBody(event);
   const { email, password } = body;
@@ -3139,13 +3300,20 @@ const login_post = defineEventHandler(async (event) => {
       message: "Invalid email or password"
     });
   }
+  if (!user.isActive) {
+    throw createError({
+      statusCode: 403,
+      message: "Your account is pending admin approval. Please wait for an admin to activate your account."
+    });
+  }
   const token = signToken(user.id);
   return {
     token,
     user: {
       id: user.id,
       name: user.name,
-      email: user.email
+      email: user.email,
+      role: user.role
     }
   };
 });
@@ -3156,6 +3324,13 @@ const login_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProper
 }, Symbol.toStringTag, { value: 'Module' }));
 
 const register_post = defineEventHandler(async (event) => {
+  const config = useRuntimeConfig(event);
+  if (config.public.allowRegistration === false) {
+    throw createError({
+      statusCode: 403,
+      message: "Registration is disabled"
+    });
+  }
   const body = await readBody(event);
   const { name, email, password } = body;
   if (!name || !email || !password) {
@@ -3185,11 +3360,12 @@ const register_post = defineEventHandler(async (event) => {
       name,
       email,
       password: hashedPassword
+      // role defaults to USER, isActive defaults to false (schema level)
     }
   });
-  const token = signToken(user.id);
   return {
-    token,
+    success: true,
+    message: "Account created successfully. Please wait for admin approval.",
     user: {
       id: user.id,
       name: user.name,

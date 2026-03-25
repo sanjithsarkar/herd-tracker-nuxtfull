@@ -33,6 +33,7 @@ export { defineLazyHydrationComponent } from '#app/composables/lazy-hydration';
 export { useAuth } from '../composables/useAuth';
 export { useGeolocation } from '../composables/useGeolocation';
 export { useSocket } from '../composables/useSocket';
+export { useAdminStore } from '../stores/admin';
 export { useAuthStore } from '../stores/auth';
 export { useDashboardStore, LocationPoint } from '../stores/dashboard';
 export { useDevicesUiStore } from '../stores/devices-ui';

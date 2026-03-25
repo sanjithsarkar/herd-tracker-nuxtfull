@@ -42,9 +42,19 @@
 
           <p v-if="auth.authFormError" class="error-text">{{ auth.authFormError }}</p>
 
-          <button type="submit" class="btn btn-primary" style="width: 100%" :disabled="auth.authFormLoading">
-            {{ auth.authFormLoading ? 'Please wait...' : (auth.authFormMode === 'login' ? 'Login' : 'Create Account') }}
-          </button>
+          <!-- Registration success message -->
+          <div v-if="registrationSuccess" class="success-box">
+            <p>{{ registrationMessage }}</p>
+            <button type="button" class="btn btn-primary" style="width: 100%; margin-top: 0.75rem;" @click="switchToLogin">
+              Go to Login
+            </button>
+          </div>
+
+          <template v-else>
+            <button type="submit" class="btn btn-primary" style="width: 100%" :disabled="auth.authFormLoading">
+              {{ auth.authFormLoading ? 'Please wait...' : (auth.authFormMode === 'login' ? 'Login' : 'Create Account') }}
+            </button>
+          </template>
         </form>
       </div>
     </div>
@@ -57,6 +67,9 @@ definePageMeta({ layout: 'default' })
 const auth = useAuthStore()
 const router = useRouter()
 
+const registrationSuccess = ref(false)
+const registrationMessage = ref('')
+
 // Redirect if already logged in (auth already loaded by plugin)
 onMounted(() => {
   if (auth.isLoggedIn) {
@@ -64,16 +77,25 @@ onMounted(() => {
   }
 })
 
+const switchToLogin = () => {
+  registrationSuccess.value = false
+  registrationMessage.value = ''
+  auth.authFormMode = 'login'
+  auth.clearAuthForm()
+}
+
 const handleSubmit = async () => {
-  // Do not call clearAuthForm() here — it wipes name/email/password before the request.
   try {
     if (auth.authFormMode === 'register') {
-      await auth.register(auth.authForm.name, auth.authForm.email, auth.authForm.password)
+      const res = await auth.register(auth.authForm.name, auth.authForm.email, auth.authForm.password)
+      // Show success message instead of redirecting
+      registrationSuccess.value = true
+      registrationMessage.value = res?.message || 'Account created. Please wait for admin approval.'
     } else {
       await auth.login(auth.authForm.email, auth.authForm.password)
+      auth.clearAuthForm()
+      router.push('/dashboard')
     }
-    auth.clearAuthForm()
-    router.push('/dashboard')
   } catch {
     // Error already set in store
   }
@@ -138,5 +160,15 @@ const handleSubmit = async () => {
   color: var(--danger);
   font-size: 0.875rem;
   margin-bottom: 1rem;
+}
+
+.success-box {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: var(--radius);
+  padding: 1rem;
+  color: var(--primary);
+  font-size: 0.9rem;
+  text-align: center;
 }
 </style>

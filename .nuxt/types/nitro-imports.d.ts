@@ -13,6 +13,7 @@ declare global {
   const cachedEventHandler: typeof import('../../node_modules/nitropack/dist/runtime/internal/cache').cachedEventHandler
   const cachedFunction: typeof import('../../node_modules/nitropack/dist/runtime/internal/cache').cachedFunction
   const callNodeListener: typeof import('../../node_modules/h3').callNodeListener
+  const canManageUser: typeof import('../../server/utils/adminGuard').canManageUser
   const clearResponseHeaders: typeof import('../../node_modules/h3').clearResponseHeaders
   const clearSession: typeof import('../../node_modules/h3').clearSession
   const createApp: typeof import('../../node_modules/h3').createApp
@@ -93,6 +94,7 @@ declare global {
   const readRawBody: typeof import('../../node_modules/h3').readRawBody
   const readValidatedBody: typeof import('../../node_modules/h3').readValidatedBody
   const removeResponseHeader: typeof import('../../node_modules/h3').removeResponseHeader
+  const requireRole: typeof import('../../server/utils/adminGuard').requireRole
   const runTask: typeof import('../../node_modules/nitropack/dist/runtime/internal/task').runTask
   const sanitizeStatusCode: typeof import('../../node_modules/h3').sanitizeStatusCode
   const sanitizeStatusMessage: typeof import('../../node_modules/h3').sanitizeStatusMessage
@@ -151,6 +153,7 @@ export { defineTask, runTask } from 'nitropack/runtime/internal/task';
 export { defineNitroErrorHandler } from 'nitropack/runtime/internal/error/utils';
 export { buildAssetsURL as __buildAssetsURL, publicAssetsURL as __publicAssetsURL } from '/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/@nuxt/nitro-server/dist/runtime/utils/paths';
 export { defineAppConfig } from '/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/node_modules/@nuxt/nitro-server/dist/runtime/utils/config';
+export { requireRole, canManageUser } from '/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/server/utils/adminGuard';
 export { haversine } from '/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/server/utils/haversine';
 export { signToken, verifyToken } from '/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/server/utils/jwt';
 export { default as prisma } from '/Users/sanjithsarkar/Documents/herd/nextjs/herd-tracker-nuxtfull/server/utils/prisma';

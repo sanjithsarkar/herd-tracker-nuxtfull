@@ -10,6 +10,7 @@
         </NuxtLink>
         <NuxtLink to="/devices">Devices</NuxtLink>
         <NuxtLink to="/history">History</NuxtLink>
+        <NuxtLink v-if="auth.isAdmin" to="/admin/users" class="admin-link">Users</NuxtLink>
         <button class="btn btn-outline" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" @click="auth.logout()">
           Logout
         </button>
@@ -39,5 +40,9 @@ const tracking = useTrackingStore()
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
   50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+}
+
+.admin-link {
+  color: #fbbf24 !important;
 }
 </style>
