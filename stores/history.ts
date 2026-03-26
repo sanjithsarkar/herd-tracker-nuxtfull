@@ -7,6 +7,7 @@ export interface HistoryLocation {
   heading?: number
   altitude?: number
   timestamp: string
+  user?: { id: string; name: string }
 }
 
 export interface HistorySession {
@@ -19,6 +20,7 @@ export interface HistorySession {
   duration: number
   totalDistance: number
   pointCount: number
+  user?: { id: string; name: string; email: string }
 }
 
 const getDefaultDates = () => {
@@ -38,6 +40,7 @@ export const useHistoryStore = defineStore('history', {
       locations: [] as HistoryLocation[],
       loading: false,
       filterDeviceId: '',
+      filterUserId: '',
       viewMode: 'sessions' as 'sessions' | 'points',
       selectedSessionId: null as string | null,
       dateFrom,
@@ -62,11 +65,20 @@ export const useHistoryStore = defineStore('history', {
 
     async fetchSessions() {
       const auth = useAuthStore()
+      const isAdmin = auth.isAdmin
       try {
-        let url = `/api/sessions?from=${this.dateFrom}&to=${this.dateTo}`
-        if (this.filterDeviceId) url += `&deviceId=${this.filterDeviceId}`
-        const data = await auth.authFetch<HistorySession[]>(url)
-        this.sessions = data || []
+        if (isAdmin) {
+          let url = `/api/admin/sessions?from=${this.dateFrom}&to=${this.dateTo}`
+          if (this.filterUserId) url += `&userId=${this.filterUserId}`
+          if (this.filterDeviceId) url += `&deviceId=${this.filterDeviceId}`
+          const data = await auth.authFetch<HistorySession[]>(url)
+          this.sessions = data || []
+        } else {
+          let url = `/api/sessions?from=${this.dateFrom}&to=${this.dateTo}`
+          if (this.filterDeviceId) url += `&deviceId=${this.filterDeviceId}`
+          const data = await auth.authFetch<HistorySession[]>(url)
+          this.sessions = data || []
+        }
       } catch {
         this.sessions = []
       }
@@ -74,12 +86,22 @@ export const useHistoryStore = defineStore('history', {
 
     async fetchLocations() {
       const auth = useAuthStore()
+      const isAdmin = auth.isAdmin
       try {
-        let url = `/api/location/history/${auth.user?.id}?from=${this.dateFrom}&to=${this.dateTo}`
-        if (this.filterDeviceId) url += `&deviceId=${this.filterDeviceId}`
-        if (this.selectedSessionId) url += `&sessionId=${this.selectedSessionId}`
-        const data = await auth.authFetch<HistoryLocation[]>(url)
-        this.locations = data || []
+        if (isAdmin) {
+          let url = `/api/admin/locations?from=${this.dateFrom}&to=${this.dateTo}`
+          if (this.filterUserId) url += `&userId=${this.filterUserId}`
+          if (this.filterDeviceId) url += `&deviceId=${this.filterDeviceId}`
+          if (this.selectedSessionId) url += `&sessionId=${this.selectedSessionId}`
+          const data = await auth.authFetch<HistoryLocation[]>(url)
+          this.locations = data || []
+        } else {
+          let url = `/api/location/history/${auth.user?.id}?from=${this.dateFrom}&to=${this.dateTo}`
+          if (this.filterDeviceId) url += `&deviceId=${this.filterDeviceId}`
+          if (this.selectedSessionId) url += `&sessionId=${this.selectedSessionId}`
+          const data = await auth.authFetch<HistoryLocation[]>(url)
+          this.locations = data || []
+        }
       } catch {
         this.locations = []
       }

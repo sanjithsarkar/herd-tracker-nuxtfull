@@ -10,6 +10,7 @@
         </NuxtLink>
         <NuxtLink to="/devices">Devices</NuxtLink>
         <NuxtLink to="/history">History</NuxtLink>
+        <NuxtLink v-if="auth.isAdmin" to="/admin/devices" class="admin-link">All Devices</NuxtLink>
         <NuxtLink v-if="auth.isAdmin" to="/admin/users" class="admin-link">Users</NuxtLink>
         <button class="btn btn-outline" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" @click="auth.logout()">
           Logout

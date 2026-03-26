@@ -27,7 +27,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  if (session.userId !== user.id) {
+  const isAdmin = user.role === 'ADMIN' || user.role === 'SUPER_ADMIN'
+  if (session.userId !== user.id && !isAdmin) {
     throw createError({
       statusCode: 403,
       message: 'Not authorized to view this session',

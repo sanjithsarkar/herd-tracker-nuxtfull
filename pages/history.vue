@@ -11,12 +11,22 @@
     <!-- Filters -->
     <div class="card" style="margin-bottom: 1rem;">
       <div class="filter-row">
+        <!-- User filter (admin only) -->
+        <div v-if="auth.isAdmin" class="form-group" style="margin-bottom: 0;">
+          <label>User</label>
+          <select v-model="history.filterUserId" class="input">
+            <option value="">All Users</option>
+            <option v-for="user in adminUsers" :key="user.id" :value="user.id">
+              {{ user.name }}
+            </option>
+          </select>
+        </div>
         <div class="form-group" style="margin-bottom: 0;">
           <label>Device</label>
           <select v-model="history.filterDeviceId" class="input">
             <option value="">All Devices</option>
-            <option v-for="device in auth.devices" :key="device.id" :value="device.id">
-              {{ device.name }} ({{ device.deviceType === 'laptop' ? device.identifier?.slice(-6) : device.imei?.slice(-4) }})
+            <option v-for="device in deviceOptions" :key="device.id" :value="device.id">
+              {{ device.label }}
             </option>
           </select>
         </div>
@@ -64,7 +74,12 @@
           @click="history.selectSession(session)"
         >
           <div class="session-card-header">
-            <strong>{{ session.deviceName || 'Unknown Device' }}</strong>
+            <div>
+              <strong>{{ session.deviceName || 'Unknown Device' }}</strong>
+              <span v-if="auth.isAdmin && session.user" class="owner-tag" style="margin-left: 0.5rem;">
+                {{ session.user.name }}
+              </span>
+            </div>
             <span :class="['badge', session.status === 'active' ? 'badge-success' : 'badge-danger']" style="font-size: 0.7rem;">
               <span class="badge-dot"></span>
               {{ session.status }}
@@ -116,6 +131,7 @@
         <table class="history-table">
           <thead>
             <tr>
+              <th v-if="auth.isAdmin">User</th>
               <th>Time</th>
               <th>Latitude</th>
               <th>Longitude</th>
@@ -126,6 +142,7 @@
           </thead>
           <tbody>
             <tr v-for="loc in history.locations" :key="loc.id">
+              <td v-if="auth.isAdmin" class="owner-tag">{{ loc.user?.name || '-' }}</td>
               <td>{{ formatTime(loc.timestamp) }}</td>
               <td>{{ loc.latitude.toFixed(6) }}</td>
               <td>{{ loc.longitude.toFixed(6) }}</td>
@@ -164,11 +181,38 @@ definePageMeta({
 
 const auth = useAuthStore()
 const history = useHistoryStore()
+const admin = useAdminStore()
 
 const historyMapRef = ref<HTMLElement | null>(null)
 let map: any = null
 let polyline: any = null
 let markers: any[] = []
+
+// For admin: load users list for the filter dropdown
+const adminUsers = computed(() => {
+  if (!auth.isAdmin) return []
+  return admin.users.sort((a, b) => a.name.localeCompare(b.name))
+})
+
+// For admin: show all devices from admin store; for regular user: own devices
+const adminDevices = ref<any[]>([])
+
+const deviceOptions = computed(() => {
+  if (auth.isAdmin) {
+    let devices = adminDevices.value
+    if (history.filterUserId) {
+      devices = devices.filter((d: any) => d.userId === history.filterUserId)
+    }
+    return devices.map((d: any) => ({
+      id: d.id,
+      label: `${d.name} (${d.user?.name || 'Unknown'})`,
+    }))
+  }
+  return auth.devices.map((d: any) => ({
+    id: d.id,
+    label: `${d.name} (${d.deviceType === 'laptop' ? d.identifier?.slice(-6) : d.imei?.slice(-4)})`,
+  }))
+})
 
 const formatTime = (ts: string) => new Date(ts).toLocaleString()
 
@@ -254,10 +298,21 @@ watch(() => history.viewMode, () => {
   }
 })
 
+// When user filter changes, reset device filter
+watch(() => history.filterUserId, () => {
+  history.filterDeviceId = ''
+})
+
 onMounted(async () => {
-  try {
-    await auth.fetchDevices()
-  } catch {}
+  if (auth.isAdmin) {
+    // Load users and devices for admin filters
+    await Promise.all([
+      admin.fetchUsers(),
+      auth.authFetch<any[]>('/api/admin/devices').then((d) => { adminDevices.value = d || [] }).catch(() => {}),
+    ])
+  } else {
+    try { await auth.fetchDevices() } catch {}
+  }
   await history.fetchData()
   await nextTick()
   drawRoute()
@@ -310,6 +365,12 @@ onUnmounted(() => {
   gap: 1rem;
   align-items: flex-end;
   flex-wrap: wrap;
+}
+
+.owner-tag {
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.8rem;
 }
 
 .session-list {

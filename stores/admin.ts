@@ -7,10 +7,34 @@ interface AdminUser {
   createdAt: string
 }
 
+interface AdminDevice {
+  id: string
+  userId: string
+  deviceType: 'mobile' | 'laptop'
+  imei: string | null
+  identifier: string | null
+  name: string
+  isActive: boolean
+  lastSeen: string | null
+  createdAt: string
+  user: {
+    id: string
+    name: string
+    email: string
+  }
+  latestLocation: {
+    latitude: number
+    longitude: number
+    timestamp: string
+  } | null
+}
+
 export const useAdminStore = defineStore('admin', {
   state: () => ({
     users: [] as AdminUser[],
+    devices: [] as AdminDevice[],
     loading: false,
+    devicesLoading: false,
     error: '',
   }),
 
@@ -58,6 +82,19 @@ export const useAdminStore = defineStore('admin', {
       } catch (err: any) {
         this.error = err?.data?.message || 'Failed to delete user'
         throw err
+      }
+    },
+
+    async fetchDevices() {
+      const auth = useAuthStore()
+      this.devicesLoading = true
+      this.error = ''
+      try {
+        this.devices = await auth.authFetch<AdminDevice[]>('/api/admin/devices')
+      } catch (err: any) {
+        this.error = err?.data?.message || 'Failed to fetch devices'
+      } finally {
+        this.devicesLoading = false
       }
     },
 

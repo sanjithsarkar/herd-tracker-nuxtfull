@@ -2250,16 +2250,16 @@ _sKBvAAJXKR8m2OJWympHLqpwkOqXrFrRSq10bpHmvM
 const assets = {
   "/index.mjs": {
     "type": "text/javascript; charset=utf-8",
-    "etag": "\"22098-AeC2EUey3c1l+Q2xzb2aUj3ZLvw\"",
-    "mtime": "2026-03-25T23:48:31.277Z",
-    "size": 139416,
+    "etag": "\"22f1a-7q1wyebZe/COB+I9ZBabLgNniOo\"",
+    "mtime": "2026-03-26T01:34:13.192Z",
+    "size": 143130,
     "path": "index.mjs"
   },
   "/index.mjs.map": {
     "type": "application/json",
-    "etag": "\"82b94-68iapPfy5eh0NyFr+oBoD7q9Ro0\"",
-    "mtime": "2026-03-25T23:48:31.277Z",
-    "size": 535444,
+    "etag": "\"84f02-/mlYMVob8d5KNmBjwBPZpvSXMcI\"",
+    "mtime": "2026-03-26T01:34:13.193Z",
+    "size": 544514,
     "path": "index.mjs.map"
   }
 };
@@ -2758,6 +2758,9 @@ async function getIslandContext(event) {
 	return ctx;
 }
 
+const _lazy_UW7ZoH = () => Promise.resolve().then(function () { return devices_get$3; });
+const _lazy_tscqjN = () => Promise.resolve().then(function () { return locations_get$1; });
+const _lazy_EY8fcD = () => Promise.resolve().then(function () { return sessions_get$3; });
 const _lazy_16FMCG = () => Promise.resolve().then(function () { return users_get$1; });
 const _lazy_Sgpy92 = () => Promise.resolve().then(function () { return _id__delete$5; });
 const _lazy_GcYb9K = () => Promise.resolve().then(function () { return role_patch$1; });
@@ -2783,6 +2786,9 @@ const _lazy_9cOspZ = () => Promise.resolve().then(function () { return renderer$
 const handlers = [
   { route: '', handler: _Psbl7H, lazy: false, middleware: true, method: undefined },
   { route: '', handler: _gFhG3L, lazy: false, middleware: true, method: undefined },
+  { route: '/api/admin/devices', handler: _lazy_UW7ZoH, lazy: true, middleware: false, method: "get" },
+  { route: '/api/admin/locations', handler: _lazy_tscqjN, lazy: true, middleware: false, method: "get" },
+  { route: '/api/admin/sessions', handler: _lazy_EY8fcD, lazy: true, middleware: false, method: "get" },
   { route: '/api/admin/users', handler: _lazy_16FMCG, lazy: true, middleware: false, method: "get" },
   { route: '/api/admin/users/:id', handler: _lazy_Sgpy92, lazy: true, middleware: false, method: "delete" },
   { route: '/api/admin/users/:id/role', handler: _lazy_GcYb9K, lazy: true, middleware: false, method: "patch" },
@@ -3174,6 +3180,118 @@ function canManageUser(managerRole, targetRole) {
   const targetLevel = ROLE_HIERARCHY[targetRole] || 0;
   return managerLevel > targetLevel;
 }
+
+const devices_get$2 = defineEventHandler(async (event) => {
+  requireRole(event, "ADMIN");
+  const devices = await prisma.device.findMany({
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true
+        }
+      },
+      locations: {
+        orderBy: { timestamp: "desc" },
+        take: 1,
+        select: {
+          latitude: true,
+          longitude: true,
+          timestamp: true
+        }
+      }
+    },
+    orderBy: { createdAt: "desc" }
+  });
+  return devices.map((d) => ({
+    ...d,
+    latestLocation: d.locations[0] || null,
+    locations: void 0
+  }));
+});
+
+const devices_get$3 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: devices_get$2
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const locations_get = defineEventHandler(async (event) => {
+  requireRole(event, "ADMIN");
+  const query = getQuery$1(event);
+  const userId = query.userId;
+  const deviceId = query.deviceId;
+  const sessionId = query.sessionId;
+  const from = query.from;
+  const to = query.to;
+  const where = {};
+  if (userId) where.userId = userId;
+  if (deviceId) where.deviceId = deviceId;
+  if (sessionId) where.sessionId = sessionId;
+  if (from || to) {
+    where.timestamp = {};
+    if (from) where.timestamp.gte = new Date(from);
+    if (to) {
+      const toDate = new Date(to);
+      toDate.setHours(23, 59, 59, 999);
+      where.timestamp.lte = toDate;
+    }
+  }
+  const locations = await prisma.location.findMany({
+    where,
+    include: {
+      user: {
+        select: { id: true, name: true }
+      }
+    },
+    orderBy: { timestamp: "desc" },
+    take: 1e3
+  });
+  return locations;
+});
+
+const locations_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: locations_get
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const sessions_get$2 = defineEventHandler(async (event) => {
+  requireRole(event, "ADMIN");
+  const query = getQuery$1(event);
+  const userId = query.userId;
+  const deviceId = query.deviceId;
+  const from = query.from;
+  const to = query.to;
+  const limit = parseInt(query.limit) || 50;
+  const where = {};
+  if (userId) where.userId = userId;
+  if (deviceId) where.deviceId = deviceId;
+  if (from || to) {
+    where.startedAt = {};
+    if (from) where.startedAt.gte = new Date(from);
+    if (to) {
+      const toDate = new Date(to);
+      toDate.setHours(23, 59, 59, 999);
+      where.startedAt.lte = toDate;
+    }
+  }
+  const sessions = await prisma.trackingSession.findMany({
+    where,
+    include: {
+      user: {
+        select: { id: true, name: true, email: true }
+      }
+    },
+    orderBy: { startedAt: "desc" },
+    take: limit
+  });
+  return sessions;
+});
+
+const sessions_get$3 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: sessions_get$2
+}, Symbol.toStringTag, { value: 'Module' }));
 
 const users_get = defineEventHandler(async (event) => {
   const admin = requireRole(event, "ADMIN");
@@ -3796,7 +3914,8 @@ const _id__get = defineEventHandler(async (event) => {
       message: "Session not found"
     });
   }
-  if (session.userId !== user.id) {
+  const isAdmin = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
+  if (session.userId !== user.id && !isAdmin) {
     throw createError({
       statusCode: 403,
       message: "Not authorized to view this session"
